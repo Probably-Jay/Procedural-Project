@@ -55,8 +55,8 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\PerlinWorm.cs" />
     <Compile Include="Assets\Simple 3D Noise\NoiseS3D.cs" />
+    <Compile Include="Assets\PerlinWorm.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Simple 3D Noise\ReadMe.txt" />
