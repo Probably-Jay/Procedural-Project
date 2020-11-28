@@ -52,6 +52,7 @@ public class PerlinWorm : MonoBehaviour
             float theta, phi;
 
             theta = (noise + 1) * Mathf.PI;
+            phi = (noise + 1)
 
             var theta = noise + 1; //0 to 2
             theta *= Mathf.PI; // 0 to 2pi
