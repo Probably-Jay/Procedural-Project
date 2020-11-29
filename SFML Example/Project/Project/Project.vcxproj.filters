@@ -4,17 +4,8 @@
     <ClCompile Include="main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Tank.cpp">
-      <Filter>Source\Example</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Tank.h">
-      <Filter>Header\Example</Filter>
-    </ClInclude>
-    <ClInclude Include="TankMessage.h">
-      <Filter>Header\Example</Filter>
-    </ClInclude>
+    <ClCompile Include="ProceduralAudioStream.cpp" />
+    <ClCompile Include="SinWave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -23,11 +14,14 @@
     <Filter Include="Header">
       <UniqueIdentifier>{004a3e4c-3c17-4aee-a2ce-7d8c29f16037}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Example">
-      <UniqueIdentifier>{3f318e65-ec36-4061-a951-c6b3b255736c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header\Example">
-      <UniqueIdentifier>{7da36656-c864-44a2-aef3-23667136815f}</UniqueIdentifier>
-    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ProceduralAudioStream.h" />
+    <ClInclude Include="main.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="SinWave.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

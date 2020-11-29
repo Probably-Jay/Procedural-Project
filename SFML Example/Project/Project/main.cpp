@@ -1,31 +1,57 @@
-#include <SFML\Graphics.hpp>
 #include <sstream>
 #include <iomanip>
-#include "Tank.h"
-#include "TankMessage.h"
+
 #include <iostream>
  
 #include "SFML/Audio.hpp"
-//#include "SFML//Audio/SoundBuffer.hpp"
-
-////Rounds a float to two decimal places and turns it into a string
-//std::string Stringify( float value ) {
-//	std::stringstream sStream;
-//	sStream << std::fixed << std::setprecision( 2 ) << valueI 
-//	std::string t;
-//	sStream >> t;
-//	return t;
-//}
+#include "main.h"
+#include "SinWave.h"
 
 int main() {
 	
 	sf::SoundBuffer buffer;
+
+	const int numberOfSamples = 44100;
 	
+	sf::Int16 samples[numberOfSamples];
+
+	for (size_t i = 0; i < numberOfSamples; i++)
+	{
+		samples[i] = 0;
+	}
+
+	//GenerateAudio(samples, numberOfSamples);
+	SinWave sinwave;
+
+	sinwave.trigger(440, 0);
+	sinwave.GenerateAudio(samples, numberOfSamples);
+
+	/*for (size_t i = 0; i < numberOfSamples; i++)
+	{
+		if (abs(samples[i]) < 1) {
+			samples[i] *= 32000;
+		}
+	}*/
+
+	//sf::Int16 *samplea
+
+	buffer.loadFromSamples(
+		samples,
+		numberOfSamples,
+		1,
+		numberOfSamples
+	);
+	sf::Sound sound;
+
+	sound.setBuffer(buffer);
+
+	sound.play();
 
 	int p;
 	std::cin >> p;
 	return 0;
 }
+
 
 
 
