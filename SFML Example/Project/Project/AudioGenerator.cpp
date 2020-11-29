@@ -1,12 +1,13 @@
-#include "SinWave.h"
+#include "AudioGenerator.h"
 
-SinWave::SinWave()
-	:sampleRate(44100)
+AudioGenerator::AudioGenerator()
+	: sampleRate(44100)
+	, bpm
 {
 }
 
 // from lecture
-void SinWave::GenerateAudio(sf::Int16* buffer, const int numberOfSamples)
+void AudioGenerator::GenerateAudio(sf::Int16* buffer, const int numberOfSamples)
 {
 
 	for (size_t i = startSample; i < numberOfSamples; i++)
@@ -39,7 +40,7 @@ void SinWave::GenerateAudio(sf::Int16* buffer, const int numberOfSamples)
 	startSample = 0;
 }
 
-void SinWave::setSampleRate(float val)
+void AudioGenerator::setSampleRate(float val)
 {
 	sampleRate = val;
 
@@ -47,11 +48,15 @@ void SinWave::setSampleRate(float val)
 }
 
 
-void SinWave::trigger(float pitch, int sample)
+void AudioGenerator::trigger(float pitch, int sample)
 {
 	frequency = pitch;
 	sinIncriment = (2 * PI * frequency) / sampleRate;
 
 	ampIndex = 0;
 	startSample = sample; 
+}
+
+void AudioGenerator::FillBuffer()
+{
 }

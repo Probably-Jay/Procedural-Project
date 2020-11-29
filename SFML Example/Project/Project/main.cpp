@@ -6,6 +6,7 @@
 #include "SFML/Audio.hpp"
 #include "main.h"
 #include "SinWave.h"
+#include "ProceduralAudioStream.h"
 
 int main() {
 	
@@ -21,7 +22,7 @@ int main() {
 	}
 
 	//GenerateAudio(samples, numberOfSamples);
-	SinWave sinwave;
+	AudioGenerator sinwave;
 
 	sinwave.trigger(440, 0);
 	sinwave.GenerateAudio(samples, numberOfSamples);
@@ -46,6 +47,13 @@ int main() {
 	sound.setBuffer(buffer);
 
 	sound.play();
+
+
+	//ProceduralAudioStream audioStream;
+
+	//audioStream.set
+
+
 
 	int p;
 	std::cin >> p;

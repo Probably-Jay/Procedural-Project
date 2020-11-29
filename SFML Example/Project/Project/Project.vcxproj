@@ -29,12 +29,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ProceduralAudioStream.cpp" />
-    <ClCompile Include="SinWave.cpp" />
+    <ClCompile Include="AudioGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
     <ClInclude Include="ProceduralAudioStream.h" />
-    <ClInclude Include="SinWave.h" />
+    <ClInclude Include="AudioGenerator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -4,8 +4,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ProceduralAudioStream.cpp" />
-    <ClCompile Include="SinWave.cpp" />
+    <ClCompile Include="ProceduralAudioStream.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioGenerator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -16,11 +20,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ProceduralAudioStream.h" />
     <ClInclude Include="main.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="SinWave.h">
+    <ClInclude Include="ProceduralAudioStream.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioGenerator.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
