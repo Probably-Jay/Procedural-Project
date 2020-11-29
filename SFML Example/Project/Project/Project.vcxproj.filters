@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorHandler.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkHandlerBase.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkSimulator.cpp">
+      <Filter>Source\Example</Filter>
+    </ClCompile>
+    <ClCompile Include="Tank.cpp">
+      <Filter>Source\Example</Filter>
+    </ClCompile>
+    <ClCompile Include="ValidatedPackage.cpp" />
+    <ClCompile Include="ClientHandle.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketStruct.cpp">
+      <Filter>Source\Networking</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorHandler.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkHandlerBase.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkSimulator.h">
+      <Filter>Header\Example</Filter>
+    </ClInclude>
+    <ClInclude Include="Tank.h">
+      <Filter>Header\Example</Filter>
+    </ClInclude>
+    <ClInclude Include="TankMessage.h">
+      <Filter>Header\Example</Filter>
+    </ClInclude>
+    <ClInclude Include="serverConfig.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ValidatedPackage.h" />
+    <ClInclude Include="ClientHandle.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketStruct.h">
+      <Filter>Header\Networking</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{2402bd78-09a5-44f6-bc39-5352abda1570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{004a3e4c-3c17-4aee-a2ce-7d8c29f16037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Networking">
+      <UniqueIdentifier>{50164f8e-3801-43eb-a076-3cc00d36a169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Networking">
+      <UniqueIdentifier>{99a86d26-ad65-4b25-94f5-f5e8dcb2c5d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Example">
+      <UniqueIdentifier>{3f318e65-ec36-4061-a951-c6b3b255736c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header\Example">
+      <UniqueIdentifier>{7da36656-c864-44a2-aef3-23667136815f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
