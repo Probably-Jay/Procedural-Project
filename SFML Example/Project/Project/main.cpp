@@ -5,8 +5,8 @@
 #include "TankMessage.h"
 #include <iostream>
  
-//#include "SFML/Audio.hpp"
-//#include "SFML//Audio/"
+#include "SFML/Audio.hpp"
+//#include "SFML//Audio/SoundBuffer.hpp"
 
 ////Rounds a float to two decimal places and turns it into a string
 //std::string Stringify( float value ) {
@@ -19,7 +19,7 @@
 
 int main() {
 	
-
+	sf::SoundBuffer buffer;
 	
 
 	int p;
