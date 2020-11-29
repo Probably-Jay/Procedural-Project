@@ -2,17 +2,11 @@
 #include <sstream>
 #include <iomanip>
 #include "Tank.h"
-#include "NetworkSimulator.h"
 #include "TankMessage.h"
 #include <iostream>
-
-
-#include "SFML/Network.hpp"
-
-#include "Client.h"
-#include "Server.h"
-
-#include "main.h"
+ 
+//#include "SFML/Audio.hpp"
+//#include "SFML//Audio/"
 
 ////Rounds a float to two decimal places and turns it into a string
 //std::string Stringify( float value ) {
@@ -25,36 +19,12 @@
 
 int main() {
 	
-	char c;
-	std::cin >> c;
+
 	
-	if (c == 'c' || c == ' ') {
-		ClientMain();
-	}
-	else {
-		ServerMain();
-	}
+
 	int p;
 	std::cin >> p;
 	return 0;
-}
-
-
-
-void ClientMain()
-{
-	Client client{};
-	client.Connect();
-	cout << endl << "===Heartbeat===" << endl;
-	client.Connect();
-}
-
-
-
-void ServerMain()
-{
-	Server server{};
-	server.ListenForConnections();
 }
 
 
