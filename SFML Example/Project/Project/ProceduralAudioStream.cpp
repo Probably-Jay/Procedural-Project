@@ -3,56 +3,70 @@
 
 
 
-ProceduralAudioStream::ProceduralAudioStream() :
+ProceduralAudioStream::ProceduralAudioStream() 
+	// owned objects
+	: audioGenerator(std::make_unique< AudioGenerator>())
+	, hotBufferMutex(audioGenerator->GetBufferMutex())
 	// initial values
-	chunkDuraton(1),
+	,chunkDuraton(1)
 	// default values
-	currentSample(0),
-	sampleRate(44100)
+	,currentSample(0)
+	,sampleRate(44100)
 {
+	SoundStream::initialize(1, sampleRate);
 }
 
-// standard load from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
-void ProceduralAudioStream::load(const sf::SoundBuffer& buffer)
+
+
+
+// based off standard load from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
+// made threadsafe by me
+void ProceduralAudioStream::load(const sf::SoundBuffer& hotBuffer)
 {
+	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
+
 	// extract the audio samples from the sound buffer to our own container
-	samples.assign(buffer.getSamples(), buffer.getSamples() + buffer.getSampleCount());
 
 	// reset the current playing position 
 	currentSample = 0;
 
-	sampleRate = buffer.getSampleRate();
+}
 	
-	// initialize the base class
-	SoundStream::initialize(buffer.getChannelCount(),sampleRate);
 
+void ProceduralAudioStream::loadToSamples()
+{
+	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
+	auto buffer = audioGenerator->GetHotBuffer();
+	samples.assign(buffer->getSamples(), buffer->getSamples() + buffer->getSampleCount());
 }
 
 // standard onGetData from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
 bool ProceduralAudioStream::onGetData(Chunk& data)
 {
-	// number of samples to stream every time the function is called;
-	   // in a more robust implementation, it should be a fixed
-	   // amount of time rather than an arbitrary number of samples
+	
 
-	const int samplesToStream = sampleRate * chunkDuraton; // (chunk duration) seconds of samples per chunk
+	int samplesToStream = sampleRate * chunkDuraton; // 44100 (chunk duration) seconds of samples per chunk
 
 	// set the pointer to the next audio samples to be played
 	data.samples = &samples[currentSample];
 
-	// have we reached the end of the sound?
-	if (currentSample + samplesToStream <= samples.size())
-	{
-		// end not reached: stream the samples and continue
-		data.sampleCount = samplesToStream;
-		currentSample += samplesToStream;
-		return true;
+	// can't stream full chunk
+	if (currentSample + samplesToStream > samples.size()) {
+		if (currentSample < samples.size()) // stream whatever's left
+		{
+			samplesToStream = samples.size() - currentSample;
+			currentSample = samples.size();
+		}
+		else // nothing else to stream
+		{
+			loadToSamples();
+			currentSample = 0;
+		}
 	}
-	else
-	{
-		// end of stream reached: stream the remaining samples and stop playback
-		data.sampleCount = 0;
-		currentSample = samples.size();
-		return false;
-	}
+
+
+	data.sampleCount = samplesToStream;
+	currentSample += samplesToStream;
+	return true;
+
 }
