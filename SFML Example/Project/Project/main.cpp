@@ -5,13 +5,16 @@
  
 #include "SFML/Audio.hpp"
 #include "main.h"
-#include "SinWave.h"
+//#include "SinWave.h"
 #include "ProceduralAudioStream.h"
+#include <memory>
 
 int main() {
 	
 	sf::SoundBuffer buffer;
-
+	std::unique_ptr<const sf::SoundBuffer> ptr= std::make_unique<const sf::SoundBuffer>((const sf::SoundBuffer)buffer);
+	
+	
 	const int numberOfSamples = 44100;
 	
 	sf::Int16 samples[numberOfSamples];
@@ -24,8 +27,8 @@ int main() {
 	//GenerateAudio(samples, numberOfSamples);
 	AudioGenerator sinwave;
 
-	sinwave.trigger(440, 0);
-	sinwave.GenerateAudio(samples, numberOfSamples);
+//	sinwave.trigger(440, 0);
+//	sinwave.GenerateAudio(samples, numberOfSamples);
 
 	/*for (size_t i = 0; i < numberOfSamples; i++)
 	{
@@ -36,17 +39,17 @@ int main() {
 
 	//sf::Int16 *samplea
 
-	buffer.loadFromSamples(
-		samples,
-		numberOfSamples,
-		1,
-		numberOfSamples
-	);
-	sf::Sound sound;
+	//buffer.loadFromSamples(
+	//	samples,
+	//	numberOfSamples,
+	//	1,
+	//	numberOfSamples
+	//);
+	//sf::Sound sound;
 
-	sound.setBuffer(buffer);
+	//sound.setBuffer(buffer);
 
-	sound.play();
+	//sound.play();
 
 
 	//ProceduralAudioStream audioStream;

@@ -6,8 +6,11 @@ AudioGenerator::AudioGenerator()
 	, noteSize(sampleRate * 1.f/bps)
 	, chunksPerBuffer(4)
 	, bufferSize(chunksPerBuffer * sampleRate)
+	, hotBuffer(&buffer1)
+	, backBuffer(&buffer2)
 {
 	hotbufferMutex = std::shared_ptr<std::mutex>();
+	//MainGeneration();
 }
 
 // from lecture
@@ -73,7 +76,7 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 
 			audio *= ampEnvelope * 0.33f;
 
-			buffer[i] += (audio*32000);
+		//	buffer[i] += (audio*32000);
 
 		}
 
@@ -85,38 +88,72 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 
 
 
-std::unique_ptr<const sf::SoundBuffer> AudioGenerator::LoadFromHotBuffer()
+std::unique_ptr<sf::SoundBuffer> AudioGenerator::LoadFromHotBuffer()
 {
 	std::unique_lock<std::mutex> lock(bufferReadyMutex);
 	bufferReadyCv.wait(lock, [this] {return this->bufferReady; });
 	bufferReady = false;
-	//sf::SoundBuffer temp = *hotBuffer; // as soon as we signal the cv then hotBuffer will be swapped
-
-	//bufferSent = true;
+ 
 	lock.unlock();
 	return std::move(hotBuffer);
 }
 
-void AudioGenerator::FinishedWithHotBuffer()
+void AudioGenerator::FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer> buffer)
+{
+	hotBuffer.swap(buffer);
+
+	bufferSent = true;
+	bufferSentCv.notify_one();
+}
+
+
+
+void AudioGenerator::MainGeneration()
+{
+	running = true;
+	InitialGeneration();
+	while (running) {
+		Generate();
+	}
+}
+
+void AudioGenerator::InitialGeneration()
 {
 }
 
-void AudioGenerator::ClearBuffer()
+void AudioGenerator::Generate()
 {
-	for(backBuffer)
+	CleanBackBuffer();
+	/*
+		do generation on back buffer
+	*/
+	std::unique_lock<std::mutex> lock(bufferSentMutex);
+	bufferSentCv.wait(lock, [this] {return bufferSent; });
+	
+	//backBuffer.swap(std::make_unique<sf::SoundBuffer>(&hotBuffer));
+	hotBuffer.swap(backBuffer);
+
+	
+
+	lock.unlock();
+}
+
+void AudioGenerator::CleanBackBuffer()
+{
+	//backBuffer->loadFromSamples()
 }
 
 
 
 
-void AudioGenerator::trigger(float pitch, int sample)
-{
-	frequency = pitch;
-	sinIncriment = (2 * PI * frequency) / sampleRate;
-
-	ampIndex = 0;
-	startSample = sample; 
-}
+//void AudioGenerator::trigger(float pitch, int sample)
+//{
+//	frequency = pitch;
+//	sinIncriment = (2 * PI * frequency) / sampleRate;
+//
+//	ampIndex = 0;
+//	startSample = sample; 
+//}
 
 void AudioGenerator::FillBuffer()
 {

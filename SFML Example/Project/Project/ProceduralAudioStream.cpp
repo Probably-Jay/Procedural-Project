@@ -5,8 +5,10 @@
 
 ProceduralAudioStream::ProceduralAudioStream() 
 	// owned objects
-	: audioGenerator(std::make_unique< AudioGenerator>())
+	: audioGenerator(std::make_shared< AudioGenerator>())
 	, hotBufferMutex(audioGenerator->GetBufferMutex())
+
+	//, generatorThread(new std::thread(&AudioGenerator::MainGeneration,audioGenerator))
 	// initial values
 	,chunkDuraton(1)
 	// default values
@@ -14,33 +16,41 @@ ProceduralAudioStream::ProceduralAudioStream()
 	,sampleRate(44100)
 {
 	SoundStream::initialize(1, sampleRate);
+	//generatorThread
+	generatorThread = std::thread ( &AudioGenerator::MainGeneration, audioGenerator );
+	
 }
 
-
-
-
-// based off standard load from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
-// made threadsafe by me
-void ProceduralAudioStream::load(const sf::SoundBuffer& hotBuffer)
+ProceduralAudioStream::~ProceduralAudioStream()
 {
-	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
-
-	// extract the audio samples from the sound buffer to our own container
-
-	// reset the current playing position 
-	currentSample = 0;
-
 }
+
+
+
+
+//// based off standard load from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
+//// made threadsafe by me
+//void ProceduralAudioStream::load(const sf::SoundBuffer& hotBuffer)
+//{
+//	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
+//
+//	// extract the audio samples from the sound buffer to our own container
+//
+//	// reset the current playing position 
+//	currentSample = 0;
+//
+//}
 	
 
 void ProceduralAudioStream::loadToSamples()
 {
 	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
-	auto buffer = audioGenerator->GetHotBuffer();
+	auto buffer = audioGenerator->LoadFromHotBuffer();
 	samples.assign(buffer->getSamples(), buffer->getSamples() + buffer->getSampleCount());
+	audioGenerator->FinishedWithHotBuffer(move(buffer));
 }
 
-// standard onGetData from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
+// based on standard onGetData from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
 bool ProceduralAudioStream::onGetData(Chunk& data)
 {
 	
