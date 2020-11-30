@@ -1,17 +1,206 @@
 #include "AudioGenerator.h"
 
+//const float AudioGenerator::sampleRate = 44100;
+//const float AudioGenerator::bps = 2;
+//const int AudioGenerator::samplesPerNote = AudioGenerator::sampleRate * 1.f / AudioGenerator::bps;
+//const int AudioGenerator::chunksPerBuffer = 4;
+//const int AudioGenerator::bufferSize = AudioGenerator::chunksPerBuffer * AudioGenerator::sampleRate;
+
 AudioGenerator::AudioGenerator()
-	: sampleRate(44100)
-	, bps(2)
-	, noteSize(sampleRate * 1.f/bps)
-	, chunksPerBuffer(4)
-	, bufferSize(chunksPerBuffer * sampleRate)
-	, hotBuffer(&buffer1)
+	: hotBuffer(&buffer1)
 	, backBuffer(&buffer2)
+	//, bps(BPS)
+	, began(false)
+	, ended(false)
+	, bufferReady(false)
+	, bufferSent(true) // init both buffers
+	, sampleArray()
 {
-	hotbufferMutex = std::shared_ptr<std::mutex>();
-	//MainGeneration();
+	hotbufferMutex = std::make_unique<std::mutex>();
+	
 }
+
+void AudioGenerator::Begin()
+{
+	ended = false;
+	began = true;
+	beginCv.notify_one();
+}
+
+
+void AudioGenerator::End()
+{
+	ended = true;
+	// in unlikley event somehow stuck at barrier
+	bufferSent = true;
+	bufferSentCv.notify_all();
+
+	bufferReady = true;
+	bufferReadyCv.notify_all();
+
+	began = true;
+	beginCv.notify_all();
+}
+
+
+void AudioGenerator::MainGeneration()
+{
+	std::unique_lock<std::mutex> lk(beginMutex);
+	beginCv.wait(lk, [this] {return this->began; }); // wait for signal to begin
+
+	//InitialGeneration();
+	while (!ended) {
+		CleanSampleArray();
+		Generate();
+		FillBackBuffer();
+		SwapBuffers(); // execution suspends here if not ready for more
+	}
+}
+
+void AudioGenerator::CleanSampleArray()
+{
+	std::fill(std::begin(sampleArray), std::end(sampleArray), 0);
+}
+
+
+void AudioGenerator::Generate()
+{
+
+	for (size_t i = 0; i < NOTESPERCHUNK; i++)
+	{
+		GenerateNote(440, i * SAMPLESPERNOTE_s);
+	}
+
+}
+
+// adapted from lecture
+void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
+{
+	float sinIndex = 0;
+	//int envelopeIndex = 0;
+
+	const float sinIncrimentValue = (2.f * PI * pitch) / (float)SAMPLERATE;
+	const int samplesPerNote = SAMPLESPERNOTE_s;
+
+	// amp envelope shape
+	const int attack = (10/44100.f)* samplesPerNote;	// 0.23 %
+	const int decay =  (40000/44100.f)* samplesPerNote;	// 90.7 %
+	const int silence = (4090/44100.f)* samplesPerNote; // 9.27 %
+
+	const int sanity = samplesPerNote - (attack + decay);
+
+	const float envelopeFactor = 0.33f;
+
+	for (size_t i = startSampleIndex; i < startSampleIndex + samplesPerNote; i++)
+	{
+		if (i < (attack + decay)) // silence
+		{
+			float audio = sinf(sinIndex); // i
+
+			sinIndex += sinIncrimentValue;
+			if (sinIndex > 2 * 3.14f) sinIndex = 0;
+
+			float ampEnvelope = 0;
+
+			if (i < attack) {
+				ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
+			}
+			else if (i < (attack + decay)) {
+				ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
+			}
+
+			audio *= ampEnvelope * envelopeFactor;
+
+			if (i < sampleArray.size()) {
+				sampleArray[i] += audio;
+			}
+
+		}
+
+	}
+}
+
+
+void AudioGenerator::FillBackBuffer()
+{
+	for (size_t i = 0; i < sampleArray.size(); i++)
+	{
+		samplePreBuffer[i] = sampleArray[i] * (sf::Int16)(0.4999 * std::numeric_limits<sf::Int16>::max()); // un-normalise volume for sfml
+	}
+		
+	
+
+
+	backBuffer->loadFromSamples(
+		samplePreBuffer.data(),
+		sampleArray.size(),
+		1,
+		SAMPLERATE
+	);
+}
+
+void AudioGenerator::SwapBuffers()
+{
+	// if last hot buffer has not been sent yet, suspend here
+	std::unique_lock<std::mutex> lock(bufferSentMutex);
+	bufferSentCv.wait(lock, [this] {return bufferSent; });
+	lock.unlock();
+
+	// mutex to modify hot buffer, just in case
+	std::unique_lock<std::mutex> lk(*hotbufferMutex);
+	hotBuffer.swap(backBuffer);
+	lk.unlock();
+
+	// signal that the hot buffer can not be sent
+	bufferReady = true;
+	bufferReadyCv.notify_one(); // signal that the hot buffer can be read
+}
+
+std::unique_ptr<sf::SoundBuffer> AudioGenerator::LoadFromHotBuffer()
+{
+	hotbufferMutex->unlock(); // we might get stuck here
+	std::unique_lock<std::mutex> lock(bufferReadyMutex);
+	bufferReadyCv.wait(lock, [this] {return this->bufferReady; });
+	hotbufferMutex->lock();
+	bufferReady = false;
+ 
+	lock.unlock();
+	return std::move(hotBuffer);
+}
+
+void AudioGenerator::FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer> buffer)
+{
+	hotBuffer.swap(buffer);
+
+	bufferSent = true;
+	bufferSentCv.notify_one();
+}
+
+
+void AudioGenerator::InitialGeneration()
+{
+	CleanSampleArray();
+	Generate();
+	FillBackBuffer();
+
+	throw;
+}
+
+
+void AudioGenerator::FillBuffer()
+{
+}
+
+//void AudioGenerator::trigger(float pitch, int sample)
+//{
+//	frequency = pitch;
+//	sinIncriment = (2 * PI * frequency) / sampleRate;
+//
+//	ampIndex = 0;
+//	startSample = sample; 
+//}
+
+
 
 // from lecture
 //void AudioGenerator::GenerateAudio(sf::Int16* buffer, const int numberOfSamples)
@@ -48,113 +237,3 @@ AudioGenerator::AudioGenerator()
 //}
 
 
-// adapted from lecture
-void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
-{
-	int sinIndex = 0;
-	int envelopeIndex = 0;
-	int sinIncrimentValue = (2 * PI * pitch) / sampleRate;
-	for (size_t i = startSampleIndex; i < startSampleIndex + noteSize; i++)
-	{
-		if (envelopeIndex < 2)
-		{
-			float audio = sinf(sinIndex);
-
-			sinIndex += sinIncrimentValue;
-			if (sinIndex > 2 * 3.14f) sinIndex = 0;
-
-			float ampEnvelope;
-
-			if (envelopeIndex < 1.f) {
-				ampEnvelope = envelopeIndex;
-				envelopeIndex += 0.1f;
-			}
-			else if (envelopeIndex < 2.f) {
-				ampEnvelope = 1.f - (envelopeIndex - 1.f);
-				envelopeIndex += 0.00005f;
-			}
-
-			audio *= ampEnvelope * 0.33f;
-
-		//	buffer[i] += (audio*32000);
-
-		}
-
-	}
-	startSampleIndex = 0;
-}
-
-
-
-
-
-std::unique_ptr<sf::SoundBuffer> AudioGenerator::LoadFromHotBuffer()
-{
-	std::unique_lock<std::mutex> lock(bufferReadyMutex);
-	bufferReadyCv.wait(lock, [this] {return this->bufferReady; });
-	bufferReady = false;
- 
-	lock.unlock();
-	return std::move(hotBuffer);
-}
-
-void AudioGenerator::FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer> buffer)
-{
-	hotBuffer.swap(buffer);
-
-	bufferSent = true;
-	bufferSentCv.notify_one();
-}
-
-
-
-void AudioGenerator::MainGeneration()
-{
-	running = true;
-	InitialGeneration();
-	while (running) {
-		Generate();
-	}
-}
-
-void AudioGenerator::InitialGeneration()
-{
-}
-
-void AudioGenerator::Generate()
-{
-	CleanBackBuffer();
-	/*
-		do generation on back buffer
-	*/
-	std::unique_lock<std::mutex> lock(bufferSentMutex);
-	bufferSentCv.wait(lock, [this] {return bufferSent; });
-	
-	//backBuffer.swap(std::make_unique<sf::SoundBuffer>(&hotBuffer));
-	hotBuffer.swap(backBuffer);
-
-	
-
-	lock.unlock();
-}
-
-void AudioGenerator::CleanBackBuffer()
-{
-	//backBuffer->loadFromSamples()
-}
-
-
-
-
-//void AudioGenerator::trigger(float pitch, int sample)
-//{
-//	frequency = pitch;
-//	sinIncriment = (2 * PI * frequency) / sampleRate;
-//
-//	ampIndex = 0;
-//	startSample = sample; 
-//}
-
-void AudioGenerator::FillBuffer()
-{
-}

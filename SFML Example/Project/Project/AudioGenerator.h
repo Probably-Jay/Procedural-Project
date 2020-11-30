@@ -2,9 +2,17 @@
 #include "SFML/Audio.hpp"
 #include <memory>
 #include <mutex>
-#include <condition_variable>
-#define PI 3.1415
-
+#include <array>
+#include <condition_variable> 
+#include "StandardAlgorithms.h"
+constexpr auto PI = 3.1415f;
+ 
+constexpr float SAMPLERATE = 44100.f;
+//constexpr auto BPS = 0.0125;
+constexpr float SAMPLESPERNOTE_s = SAMPLERATE * 0.5f;
+constexpr auto CHUNKSPERBUFFER = 4;
+constexpr size_t BUFFERSIZE = CHUNKSPERBUFFER * SAMPLERATE;
+constexpr size_t NOTESPERCHUNK =  BUFFERSIZE / SAMPLESPERNOTE_s ;
 
 
 using namespace sf;
@@ -17,23 +25,26 @@ public:
 	std::unique_ptr<sf::SoundBuffer> LoadFromHotBuffer();
 	void FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer>);
 
-
+	void Begin();
 
 	void FillBuffer();
 	std::shared_ptr<std::mutex> GetBufferMutex() { return hotbufferMutex; };
-
 	void MainGeneration();
+	void SwapBuffers();
+	void End();
 private:
 	void InitialGeneration();
 	void Generate();
 
-	void CleanBackBuffer();
+	void FillBackBuffer();
+	void CleanSampleArray();
 	void GenerateNote(float pitch, int startSampleIndex);
-	const float sampleRate;
-	const float bps;
-	const int noteSize;
-	const int chunksPerBuffer;
-	const int bufferSize;
+
+	//const float sampleRate;
+	float bps;
+	int samplesPerNote;
+	//const int chunksPerBuffer;
+	//const int bufferSize;
 
 
 	//void setSampleRate(float val);
@@ -47,11 +58,16 @@ private:
 	std::mutex bufferSentMutex;
 	bool bufferSent;
 
-	bool running;
+	bool began;
+	std::condition_variable beginCv;
+	std::mutex beginMutex;
+
+	bool ended;
 
 	std::shared_ptr<std::mutex> hotbufferMutex;
 	
-
+	std::array<float, BUFFERSIZE> sampleArray;
+	std::array<sf::Int16, BUFFERSIZE> samplePreBuffer;
 
 	//float frequency;
 

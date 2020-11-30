@@ -23,6 +23,15 @@ ProceduralAudioStream::ProceduralAudioStream()
 
 ProceduralAudioStream::~ProceduralAudioStream()
 {
+	audioGenerator->End();
+	generatorThread.join();
+}
+
+void ProceduralAudioStream::Begin()
+{
+	audioGenerator->Begin();
+	loadToSamples();
+	play();
 }
 
 
@@ -58,20 +67,25 @@ bool ProceduralAudioStream::onGetData(Chunk& data)
 	int samplesToStream = sampleRate * chunkDuraton; // 44100 (chunk duration) seconds of samples per chunk
 
 	// set the pointer to the next audio samples to be played
-	data.samples = &samples[currentSample];
+	
 
 	// can't stream full chunk
-	if (currentSample + samplesToStream > samples.size()) {
-		if (currentSample < samples.size()) // stream whatever's left
+	if (currentSample + samplesToStream >= samples.size()) {
+		if (currentSample < samples.size()-1) // stream whatever's left
 		{
-			samplesToStream = samples.size() - currentSample;
-			currentSample = samples.size();
+			samplesToStream = samples.size() - currentSample-1;
+			data.samples = &samples[currentSample];
+			//currentSample = samples.size();
 		}
 		else // nothing else to stream
 		{
 			loadToSamples();
 			currentSample = 0;
+			data.samples = &samples[currentSample];
 		}
+	}
+	else {
+		data.samples = &samples[currentSample];
 	}
 
 

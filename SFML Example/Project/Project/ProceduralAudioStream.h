@@ -13,6 +13,7 @@ public:
 	ProceduralAudioStream();
 	~ProceduralAudioStream();
 
+	void Begin();
 	//void Init(unsigned int channelCount, unsigned int sampleRate);
 	
 private:

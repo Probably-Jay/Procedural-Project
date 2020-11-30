@@ -29,5 +29,8 @@
     <ClInclude Include="AudioGenerator.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="StandardAlgorithms.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

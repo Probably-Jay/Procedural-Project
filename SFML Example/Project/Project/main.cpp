@@ -9,23 +9,27 @@
 #include "ProceduralAudioStream.h"
 #include <memory>
 
+
 int main() {
-	
-	sf::SoundBuffer buffer;
-	std::unique_ptr<const sf::SoundBuffer> ptr= std::make_unique<const sf::SoundBuffer>((const sf::SoundBuffer)buffer);
-	
-	
-	const int numberOfSamples = 44100;
-	
-	sf::Int16 samples[numberOfSamples];
+ 
+	//sf::SoundBuffer buffer;
+ //	
+	//
+	//const int numberOfSamples = 44100;
+	//
+	//sf::Int16 *samples = new sf::Int16[numberOfSamples];
 
-	for (size_t i = 0; i < numberOfSamples; i++)
-	{
-		samples[i] = 0;
-	}
+	//for (size_t i = 0; i < numberOfSamples; i++)
+	//{
+	//	samples[i] = 0;
+	//}
 
-	//GenerateAudio(samples, numberOfSamples);
-	AudioGenerator sinwave;
+	////GenerateAudio(samples, numberOfSamples);
+	//AudioGenerator * gen = new AudioGenerator();
+
+	ProceduralAudioStream stream;
+
+	stream.Begin();
 
 //	sinwave.trigger(440, 0);
 //	sinwave.GenerateAudio(samples, numberOfSamples);
@@ -57,7 +61,8 @@ int main() {
 	//audioStream.set
 
 
-
+	//delete[] samples;
+	//delete gen;
 	int p;
 	std::cin >> p;
 	return 0;
