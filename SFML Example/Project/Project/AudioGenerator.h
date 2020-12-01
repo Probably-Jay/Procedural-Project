@@ -9,7 +9,7 @@ constexpr auto PI = 3.1415f;
  
 constexpr float SAMPLERATE = 44100.f;
 //constexpr auto BPS = 0.0125;
-constexpr float SAMPLESPERNOTE_s = SAMPLERATE * 0.5f;
+constexpr float SAMPLESPERNOTE_s = SAMPLERATE ;
 constexpr auto CHUNKSPERBUFFER = 4;
 constexpr size_t BUFFERSIZE = CHUNKSPERBUFFER * SAMPLERATE;
 constexpr size_t NOTESPERCHUNK =  BUFFERSIZE / SAMPLESPERNOTE_s ;

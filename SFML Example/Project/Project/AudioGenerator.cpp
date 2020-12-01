@@ -83,9 +83,11 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 	const int samplesPerNote = SAMPLESPERNOTE_s;
 
 	// amp envelope shape
-	const int attack = (10/44100.f)* samplesPerNote;	// 0.23 %
-	const int decay =  (40000/44100.f)* samplesPerNote;	// 90.7 %
-	const int silence = (4090/44100.f)* samplesPerNote; // 9.27 %
+	const int attack = startSampleIndex+(100/(float)SAMPLERATE) * samplesPerNote;	// 0.23 %
+	const int decay = startSampleIndex+(40000/(float)SAMPLERATE)* samplesPerNote;	// 90.7 %
+	const int silence = startSampleIndex+(3990/(float)SAMPLERATE)* samplesPerNote; // 9.27 %
+
+
 
 	const int sanity = samplesPerNote - (attack + decay);
 
@@ -116,7 +118,6 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 			}
 
 		}
-
 	}
 }
 
@@ -125,6 +126,7 @@ void AudioGenerator::FillBackBuffer()
 {
 	for (size_t i = 0; i < sampleArray.size(); i++)
 	{
+		sampleArray[i] = Clamp(sampleArray[i],-1, 1 );
 		samplePreBuffer[i] = sampleArray[i] * (sf::Int16)(0.4999 * std::numeric_limits<sf::Int16>::max()); // un-normalise volume for sfml
 	}
 		
