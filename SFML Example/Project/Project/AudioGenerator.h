@@ -37,7 +37,7 @@ private:
 	void Generate();
 
 	void FillBackBuffer();
-	void CleanSampleArray();
+	void FillOverflow();
 	void GenerateNote(float pitch, int startSampleIndex);
 
 	//const float sampleRate;
@@ -66,7 +66,7 @@ private:
 
 	std::shared_ptr<std::mutex> hotbufferMutex;
 	
-	std::array<float, BUFFERSIZE> sampleArray;
+	std::array<float, 2*BUFFERSIZE> sampleArray;
 	std::array<sf::Int16, BUFFERSIZE> samplePreBuffer;
 
 	//float frequency;

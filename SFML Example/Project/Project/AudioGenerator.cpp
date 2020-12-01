@@ -49,18 +49,30 @@ void AudioGenerator::MainGeneration()
 	std::unique_lock<std::mutex> lk(beginMutex);
 	beginCv.wait(lk, [this] {return this->began; }); // wait for signal to begin
 
+	std::fill(std::begin(sampleArray), std::end(sampleArray), 0); // clean the sample array
+
 	//InitialGeneration();
 	while (!ended) {
-		CleanSampleArray();
 		Generate();
 		FillBackBuffer();
 		SwapBuffers(); // execution suspends here if not ready for more
+		FillOverflow();
 	}
 }
 
-void AudioGenerator::CleanSampleArray()
+void AudioGenerator::FillOverflow()
 {
-	std::fill(std::begin(sampleArray), std::end(sampleArray), 0);
+	// copy anything past the end of the buffer to the beggining of this ons
+	for (size_t i = 0; i < BUFFERSIZE; i++)
+	{
+		sampleArray[i] = sampleArray[i + BUFFERSIZE];
+	}
+
+	// clean the end of the buffer
+	for (size_t i = BUFFERSIZE; i < 2*BUFFERSIZE; i++)
+	{
+		sampleArray[i] = 0;
+	}
 }
 
 
@@ -152,7 +164,7 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 
 void AudioGenerator::FillBackBuffer()
 {
-	for (size_t i = 0; i < sampleArray.size(); i++)
+	for (size_t i = 0; i < BUFFERSIZE; i++)
 	{
 		sampleArray[i] = Clamp(sampleArray[i],-1, 1 );
 		samplePreBuffer[i] = sampleArray[i] * (sf::Int16)(0.4999 * std::numeric_limits<sf::Int16>::max()); // un-normalise volume for sfml
@@ -160,7 +172,7 @@ void AudioGenerator::FillBackBuffer()
 
 	backBuffer->loadFromSamples(
 		samplePreBuffer.data(),
-		sampleArray.size(),
+		samplePreBuffer.size(),
 		1,
 		SAMPLERATE
 	);
@@ -206,7 +218,7 @@ void AudioGenerator::FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer> buff
 
 void AudioGenerator::InitialGeneration()
 {
-	CleanSampleArray();
+	FillOverflow();
 	Generate();
 	FillBackBuffer();
 
