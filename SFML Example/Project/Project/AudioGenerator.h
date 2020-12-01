@@ -5,12 +5,12 @@
 #include <array>
 #include <condition_variable> 
 #include "StandardAlgorithms.h"
+#include <vector>
 constexpr auto PI = 3.1415f;
  
 constexpr float SAMPLERATE = 44100.f;
-//constexpr auto BPS = 0.0125;
-constexpr float SAMPLESPERNOTE_s = SAMPLERATE ;
-constexpr auto CHUNKSPERBUFFER = 4;
+constexpr float SAMPLESPERNOTE_s = SAMPLERATE *1.f;
+constexpr auto CHUNKSPERBUFFER = 16;
 constexpr size_t BUFFERSIZE = CHUNKSPERBUFFER * SAMPLERATE;
 constexpr size_t NOTESPERCHUNK =  BUFFERSIZE / SAMPLESPERNOTE_s ;
 
@@ -45,7 +45,7 @@ private:
 	int samplesPerNote;
 	//const int chunksPerBuffer;
 	//const int bufferSize;
-
+	float sinIndex;
 
 	//void setSampleRate(float val);
 	void trigger(float pitch, int sample);

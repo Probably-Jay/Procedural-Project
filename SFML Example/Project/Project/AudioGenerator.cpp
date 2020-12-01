@@ -17,7 +17,8 @@ AudioGenerator::AudioGenerator()
 	, sampleArray()
 {
 	hotbufferMutex = std::make_unique<std::mutex>();
-	
+	sinIndex = 0;
+
 }
 
 void AudioGenerator::Begin()
@@ -65,31 +66,57 @@ void AudioGenerator::CleanSampleArray()
 
 void AudioGenerator::Generate()
 {
+	std::vector<float> pitches = {
+		  440 * powf(2, 0/12.f)
+		, 440 * powf(2, 2/12.f)
+		, 440 * powf(2, 4/12.f)
+		, 440 * powf(2, 7/12.f)
+		, 440 * powf(2, 9/12.f)
+					    
+		, 440 * powf(2, 0/12.f)
+		, 440 * powf(2, 2/12.f)
+		, 440 * powf(2, 4/12.f)
+		, 440 * powf(2, 7/12.f)
+		, 440 * powf(2, 9/12.f)
+					    
+		, 440 * powf(2, 0/12.f)
+		, 440 * powf(2, 2/12.f)
+		, 440 * powf(2, 4/12.f)
+		, 440 * powf(2, 7/12.f)
+		, 440 * powf(2, 9/12.f)
+					    
+		, 440 * powf(2, 0 / 12.f)
+		, 440 * powf(2, 4 / 12.f)
 
+		, 440 * powf(2, 5/12.f)
+		, 440 * powf(2, 11/12.f)
+	};
+	srand(time(0));
 	for (size_t i = 0; i < NOTESPERCHUNK; i++)
 	{
-		GenerateNote(440, i * SAMPLESPERNOTE_s);
+
+		GenerateNote(pitches[rand()% pitches.size()], i * SAMPLESPERNOTE_s);
 	}
+
 
 }
 
 // adapted from lecture
 void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 {
-	float sinIndex = 0;
 	//int envelopeIndex = 0;
-
+	//float sinIndex = startSampleIndex;
 	const float sinIncrimentValue = (2.f * PI * pitch) / (float)SAMPLERATE;
 	const int samplesPerNote = SAMPLESPERNOTE_s;
 
 	// amp envelope shape
-	const int attack = startSampleIndex+(100/(float)SAMPLERATE) * samplesPerNote;	// 0.23 %
-	const int decay = startSampleIndex+(40000/(float)SAMPLERATE)* samplesPerNote;	// 90.7 %
-	const int silence = startSampleIndex+(3990/(float)SAMPLERATE)* samplesPerNote; // 9.27 %
+	const int attack = startSampleIndex + (0.02f) * samplesPerNote;	// 0.023 %
+	const int decay = (0.9f) * samplesPerNote;	// 90.7 %
+	const int silence = startSampleIndex + (samplesPerNote - (attack + decay));
 
 
 
-	const int sanity = samplesPerNote - (attack + decay);
+	//const int sanity = startSampleIndex+samplesPerNote - (attack + decay);
 
 	const float envelopeFactor = 0.33f;
 
@@ -97,7 +124,7 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 	{
 		if (i < (attack + decay)) // silence
 		{
-			float audio = sinf(sinIndex); // i
+			float audio = sinf(sinIndex);
 
 			sinIndex += sinIncrimentValue;
 			if (sinIndex > 2 * 3.14f) sinIndex = 0;
@@ -108,6 +135,7 @@ void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
 				ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
 			}
 			else if (i < (attack + decay)) {
+				//float p =
 				ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
 			}
 
@@ -128,10 +156,7 @@ void AudioGenerator::FillBackBuffer()
 	{
 		sampleArray[i] = Clamp(sampleArray[i],-1, 1 );
 		samplePreBuffer[i] = sampleArray[i] * (sf::Int16)(0.4999 * std::numeric_limits<sf::Int16>::max()); // un-normalise volume for sfml
-	}
-		
-	
-
+	}	
 
 	backBuffer->loadFromSamples(
 		samplePreBuffer.data(),
