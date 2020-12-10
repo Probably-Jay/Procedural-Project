@@ -38,14 +38,25 @@ private:
 
 	void FillBackBuffer();
 	void FillOverflow();
-	void GenerateNote(float pitch, int startSampleIndex);
+	void GenerateNote(float pitch, int startSampleIndex, const int samplesPerNote);
+
+	void GenerateSamples(int startSampleIndex, const int samplesPerNote, const int attack, const int& decay, const float  incrimentValue, const float envelopeFactor);
+	float SinWave(float& index, const float incrimentValue);
+	float SawWave(float& index, const float incrimentValue);
+	float SquareWave(float& index, const float incrimentValue);
+	float TriangleWave(float& index, const float incrimentValue);
+
+
+	void GenerateSawSamples(int startSampleIndex, const int samplesPerNote, const int attack, const int& decay, const float  incrimentValue, const float envelopeFactor);
+
+	void FillSamples(const size_t i, const int attack, const int decay, float audio, const float envelopeFactor);
 
 	//const float sampleRate;
 	float bps;
 	int samplesPerNote;
 	//const int chunksPerBuffer;
 	//const int bufferSize;
-	float sinIndex;
+	//float sinIndex;
 
 	//void setSampleRate(float val);
 	void trigger(float pitch, int sample);

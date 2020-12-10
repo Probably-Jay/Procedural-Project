@@ -17,7 +17,6 @@ AudioGenerator::AudioGenerator()
 	, sampleArray()
 {
 	hotbufferMutex = std::make_unique<std::mutex>();
-	sinIndex = 0;
 
 }
 
@@ -78,86 +77,181 @@ void AudioGenerator::FillOverflow()
 
 void AudioGenerator::Generate()
 {
-	std::vector<float> pitches = {
+	
+	std::vector<float> notes = {
 		  440 * powf(2, 0/12.f)
 		, 440 * powf(2, 2/12.f)
 		, 440 * powf(2, 4/12.f)
+		, 440 * powf(2, 5 / 12.f)
 		, 440 * powf(2, 7/12.f)
 		, 440 * powf(2, 9/12.f)
-					    
-		, 440 * powf(2, 0/12.f)
-		, 440 * powf(2, 2/12.f)
-		, 440 * powf(2, 4/12.f)
-		, 440 * powf(2, 7/12.f)
-		, 440 * powf(2, 9/12.f)
-					    
-		, 440 * powf(2, 0/12.f)
-		, 440 * powf(2, 2/12.f)
-		, 440 * powf(2, 4/12.f)
-		, 440 * powf(2, 7/12.f)
-		, 440 * powf(2, 9/12.f)
-					    
-		, 440 * powf(2, 0 / 12.f)
-		, 440 * powf(2, 4 / 12.f)
-
-		, 440 * powf(2, 5/12.f)
-		, 440 * powf(2, 11/12.f)
+		, 440 * powf(2, 11 / 12.f)
 	};
+
+	enum class NoteEnum
+	{
+		A = 0,
+		B,
+		Cs,
+		D,
+		E,
+		Fs,
+		G,
+	};
+
+	enum class ChordsEnum {
+		A,
+		D,
+		E,
+	};
+
+	std::vector<NoteEnum> penta = {
+		NoteEnum::A,
+		NoteEnum::B,
+		NoteEnum::Cs,
+		NoteEnum::E,
+		NoteEnum::Fs,
+	};
+
+	std::vector<NoteEnum> spicy = {
+		NoteEnum::D,
+		NoteEnum::G
+	};
+
+	std::vector<std::vector<float>> chords = {
+		{notes[(int)NoteEnum::A],	notes[(int)NoteEnum::Cs],	notes[(int)NoteEnum::E]},
+		{notes[(int)NoteEnum::D],	notes[(int)NoteEnum::Fs],	notes[(int)NoteEnum::A]},
+		{notes[(int)NoteEnum::E],	notes[(int)NoteEnum::G],	notes[(int)NoteEnum::B]},
+	};
+
+	std::vector<ChordsEnum> Amaj = {
+		ChordsEnum::A,
+		ChordsEnum::D,
+		ChordsEnum::E,
+	};
+
+
 	srand(time(0));
 	for (size_t i = 0; i < NOTESPERCHUNK; i++)
 	{
+		int index;
+		int r = rand() % 10;
+		const int noteSize = SAMPLESPERNOTE_s * 1;
+		if (r<5) {
+			index = (int)penta[rand() % penta.size()];
+			GenerateNote(notes[index], i* noteSize, noteSize);
+		}
+		else if (r < 7){
+			index = (int)spicy[rand() % spicy.size()];
+			GenerateNote(notes[index], i* noteSize, noteSize);
+		}
+		else {
 
-		GenerateNote(pitches[rand()% pitches.size()], i * SAMPLESPERNOTE_s);
+		}
+		
+		
+	}
+
+	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
+	{
+		int index = rand() % Amaj.size();
+		const int noteSize = SAMPLESPERNOTE_s * 4;
+		for (size_t j = 0; j < 3; j++)
+		{
+			GenerateNote(chords[index][j], i * noteSize, noteSize);
+
+		}
 	}
 
 
 }
 
 // adapted from lecture
-void AudioGenerator::GenerateNote(float pitch, int startSampleIndex)
+void AudioGenerator::GenerateNote(float pitch, int startSampleIndex,const int samplesPerNote)
 {
-	//int envelopeIndex = 0;
-	//float sinIndex = startSampleIndex;
-	const float sinIncrimentValue = (2.f * PI * pitch) / (float)SAMPLERATE;
-	const int samplesPerNote = SAMPLESPERNOTE_s;
+	const float incrimentValue = (2.f * PI * pitch) / (float)SAMPLERATE;
 
-	// amp envelope shape
+	// amp envelope
 	const int attack = startSampleIndex + (0.02f) * samplesPerNote;	// 0.023 %
 	const int decay = (0.9f) * samplesPerNote;	// 90.7 %
-	const int silence = startSampleIndex + (samplesPerNote - (attack + decay));
-
-
-
-	//const int sanity = startSampleIndex+samplesPerNote - (attack + decay);
 
 	const float envelopeFactor = 0.33f;
 
+	GenerateSamples(startSampleIndex, samplesPerNote, attack, decay, incrimentValue, envelopeFactor);
+}
+
+void AudioGenerator::GenerateSamples(int startSampleIndex, const int samplesPerNote, const int attack, const int& decay, const float  sinIncrimentValue, const float envelopeFactor)
+{
+	float index = 0;
 	for (size_t i = startSampleIndex; i < startSampleIndex + samplesPerNote; i++)
 	{
 		if (i < (attack + decay)) // silence
 		{
-			float audio = sinf(sinIndex);
+			float audio = SquareWave(index, sinIncrimentValue);
 
-			sinIndex += sinIncrimentValue;
-			if (sinIndex > 2 * 3.14f) sinIndex = 0;
 
-			float ampEnvelope = 0;
-
-			if (i < attack) {
-				ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
-			}
-			else if (i < (attack + decay)) {
-				//float p =
-				ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
-			}
-
-			audio *= ampEnvelope * envelopeFactor;
-
-			if (i < sampleArray.size()) {
-				sampleArray[i] += audio;
-			}
+			FillSamples(i, attack, decay, audio, envelopeFactor);
 
 		}
+	}
+}
+
+float AudioGenerator::SinWave(float& index, const float incrimentValue)
+{
+	float audio  = sinf(index);
+
+	index += incrimentValue;
+	if (index > 2 * 3.14f) index = 0;
+	return audio;
+}
+
+float AudioGenerator::SawWave(float& index, const float incrimentValue)
+{
+	float audio = -1 + index;
+
+	index += incrimentValue;
+	if (index > 2) index = 0;
+	return audio;
+}
+
+float AudioGenerator::SquareWave(float& index, const float incrimentValue)
+{
+	float audio = index < 1 ? -1 : 1;
+
+	index += incrimentValue;
+	if (index > 2) index = 0;
+	return audio;
+}
+
+float AudioGenerator::TriangleWave(float& index, const float incrimentValue)
+{
+	float audio = index < 1 ? -1 : 1;
+
+	index += incrimentValue;
+	if (index > 2) index = 0;
+	return audio;
+}
+
+
+
+
+
+void AudioGenerator::FillSamples(const size_t i, const int attack, const int decay, float audio, const float envelopeFactor)
+{
+	float ampEnvelope = 0;
+
+	if (i < attack) {
+		ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
+	}
+	else if (i < (attack + decay)) {
+		//float p =
+		ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
+	}
+
+	audio *= ampEnvelope * envelopeFactor;
+
+	if (i < sampleArray.size()) {
+		sampleArray[i] += audio;
 	}
 }
 
