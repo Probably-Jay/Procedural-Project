@@ -85,6 +85,22 @@ void App1::BuildCubeInstances() {
 			instanceCount++;
 		}
 	}
+	//
+	////Create two crossing sine waves and only draw the cubes that are under the "height" value
+	//for (int i = 0; i < maxCubes; i++) {
+	//	float y1 = sin((float)(i % width) / 8.0f);
+	//	y1 += 1.0f;
+	//	y1 *= 16.f;
+
+	//	float y2 = sin((float)(i / (width * width)) / 4.0f);
+	//	y2 += 1.0f;
+	//	y2 *= 16.f;
+
+	//	if ((i / width) % width < y1 && (i / width) % width < y2) {
+	//		pos[instanceCount] = XMFLOAT3(2.0f * (i % width), 2.0f * ((i / width) % width), 2.0f * (i / (width * width)));
+	//		instanceCount++;
+	//	}
+	//}
 
 	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
 
