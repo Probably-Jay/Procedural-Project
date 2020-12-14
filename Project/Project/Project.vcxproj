@@ -168,11 +168,15 @@
     <ClCompile Include="InstancedCubeMesh.cpp" />
     <ClCompile Include="InstanceShader.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="TerrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h" />
     <ClInclude Include="InstancedCubeMesh.h" />
     <ClInclude Include="InstanceShader.h" />
+    <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="TerrainGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DXFramework\DXFramework.vcxproj">

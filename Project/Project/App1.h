@@ -6,6 +6,8 @@
 #include "DXF.h"	// include dxframework
 #include "InstanceShader.h"
 #include "InstancedCubeMesh.h"
+#include "TerrainGenerator.h"
+
 
 
 class App1 : public BaseApplication
@@ -29,6 +31,9 @@ private:
 	InstancedCubeMesh* m_InstancedCube;
 
 	Light* light;
+
+	TerrainGenerator gen;
+
 };
 
 #endif

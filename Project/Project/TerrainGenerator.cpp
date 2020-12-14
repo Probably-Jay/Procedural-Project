@@ -2,31 +2,32 @@
 
 bool TerrainGenerator::CubeSolid(float x, float y, float z)
 {
-	return z < TerrainHeight(x, y);
+	return y < TerrainHeight(x, z);
 }
 
-float TerrainGenerator::TerrainHeight(float x, float y)
+float TerrainGenerator::TerrainHeight(float x, float z)
 {
-	return groundLevel + FractalPerlin(x,y,1);
+	return groundLevel + FractalPerlin(x,z,1);
 }
 
-float TerrainGenerator::FractalPerlin(float x, float y, int itter)
+float TerrainGenerator::FractalPerlin(float x, float z, int itter)
 {
 	float ampl = amplitude;
 	float freq = frequency;
 	float height = 0;
 	for (int i = 0; i < itter; i++)
 	{
-		height += Perlin(x, y, ampl, freq, (24 + i) * 21.578 + 49, (-67 - i) * 13.68 + 50);
+		height += Perlin(x, z, ampl, freq, (24 + i) * 21.578 + 49, (-67 - i) * 13.68 + 50);
 		ampl /= 4.f;
 		freq *= 4;
 	}
+	return height;
 }
 
 
-float TerrainGenerator::Perlin(float x, float y, float amplitude, float frequency, float xOffset, float yOffset)
+float TerrainGenerator::Perlin(float x, float z, float amplitude, float frequency, float xOffset, float zOffset)
 {
-	 PerlinNoise::Perlin(x * frequency + xOffset, y * frequency + yOffset) * amplitude;
+	 return PerlinNoise::Perlin(x * frequency + xOffset, z * frequency + zOffset) * amplitude;
 }
 
 //void TerrainGenerator::BuildPerlin(int itter)

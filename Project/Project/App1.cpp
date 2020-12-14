@@ -1,5 +1,4 @@
 #include "App1.h"
-
 App1::App1()
 {
 	m_InstanceShader = nullptr;
@@ -22,6 +21,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light->setDiffuseColour(0.8f, 0.8f, 0.8f, 1.0f);
 	light->setAmbientColour(0.1f, 0.1f,0.1f, 1.0f);
 	light->setDirection(0.578f, -0.578f, 0.578f);
+
+	auto cPos = camera->getPosition();
+	camera->setPosition(cPos.x, gen.TerrainHeight(cPos.x,cPos.z)+5, cPos.y);
 
 	BuildCubeInstances();
 }
@@ -69,21 +71,24 @@ void App1::BuildCubeInstances() {
 
 	XMFLOAT3* pos = new XMFLOAT3[maxCubes];
 
+	//XMFLOAT3 origin = { -width / 2,-64,-width / 2 };
+	XMFLOAT3 origin = {0,0,0};
+
 	int instanceCount = 0;
 	//Create two crossing sine waves and only draw the cubes that are under the "height" value
 	for (int i = 0; i < maxCubes; i++) {
-		float y1 = sin((float)(i % width) / 8.0f);
-		y1 += 1.0f;
-		y1 *= 16.f;
 
-		float y2 = sin((float)(i / (width * width)) / 4.0f);
-		y2 += 1.0f;
-		y2 *= 16.f;
+		float x = 2* (i % width);
+		float z = 2 * ((i / (int)width) % width);
 
-		if ((i / width) % width < y1 && (i / width) % width < y2) {
-			pos[instanceCount] = XMFLOAT3(2.0f * (i % width), 2.0f * ((i / width) % width), 2.0f * (i / (width * width)));
+		float y = 2*(i / (int)(width * width));
+
+		
+		if (gen.CubeSolid(x,y,z)) {
+			pos[instanceCount] = XMFLOAT3(origin.x + x,origin.y +  y,origin.z + z);
 			instanceCount++;
 		}
+
 	}
 	//
 	////Create two crossing sine waves and only draw the cubes that are under the "height" value
