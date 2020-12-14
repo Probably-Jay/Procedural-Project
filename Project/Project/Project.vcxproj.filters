@@ -27,6 +27,8 @@
     <ClCompile Include="TerrainGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="ChunkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h">
@@ -44,6 +46,8 @@
     <ClInclude Include="TerrainGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Chunk.h" />
+    <ClInclude Include="ChunkManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

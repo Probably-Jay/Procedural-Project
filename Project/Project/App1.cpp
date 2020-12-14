@@ -10,7 +10,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Load textures
-	textureMgr->loadTexture(L"brick", L"res/Brick2.png");
+	textureMgr->loadTexture(L"grass", L"res/grass_14.png");
 
 	// Create Mesh object and shader object
 	m_InstancedCube = new InstancedCubeMesh(renderer->getDevice(), renderer->getDeviceContext(), 1);
@@ -25,7 +25,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	auto cPos = camera->getPosition();
 	camera->setPosition(cPos.x, gen.TerrainHeight(cPos.x,cPos.z)+5, cPos.y);
 
-	BuildCubeInstances();
+	LoadChunk();
 }
 
 
@@ -64,12 +64,12 @@ bool App1::frame()
 
 	return true;
 }
-void App1::BuildCubeInstances() {
+void App1::LoadChunk(XMFLOAT3 chunkCords) {
 
 	const int width = 64;
 	const int maxCubes = width * width * width;
 
-	XMFLOAT3* pos = new XMFLOAT3[maxCubes];
+	//XMFLOAT3* pos = new XMFLOAT3[maxCubes];
 
 	//XMFLOAT3 origin = { -width / 2,-64,-width / 2 };
 	XMFLOAT3 origin = {0,0,0};
@@ -83,8 +83,18 @@ void App1::BuildCubeInstances() {
 
 		float y = 2*(i / (int)(width * width));
 
+		bool solid = (
+			gen.CubeSolid(x, y, z) // we should be solid
+			&& 
+			( // we are visible
+				!gen.CubeSolid(x, y + 2, z) || // above
+				!gen.CubeSolid(x - 2, y, z) || // left
+				!gen.CubeSolid(x + 2, y, z) || // right
+				!gen.CubeSolid(x, y, z + 2) || // behind
+				!gen.CubeSolid(x, y, z - 2)    // infront
+			)); // this is a lot of calls but this should short - circuit most of the time
 		
-		if (gen.CubeSolid(x,y,z)) {
+		if (solid) {
 			pos[instanceCount] = XMFLOAT3(origin.x + x,origin.y +  y,origin.z + z);
 			instanceCount++;
 		}
@@ -107,10 +117,14 @@ void App1::BuildCubeInstances() {
 	//	}
 	//}
 
+	SendChunks(pos, instanceCount);
+}
+
+void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
+{
 	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
 
-	delete[] pos;
-	pos = 0;
+
 }
 
 bool App1::render()
@@ -129,7 +143,7 @@ bool App1::render()
 	projectionMatrix = renderer->getProjectionMatrix();
 
 	// Send geometry data, set shader parameters, render object with shader
-	m_InstanceShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light);
+	m_InstanceShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), light);
 	m_InstancedCube->sendDataInstanced(renderer->getDeviceContext());
 	m_InstanceShader->renderInstanced(renderer->getDeviceContext(), m_InstancedCube->getIndexCount(), m_InstancedCube->GetInstanceCount());
 

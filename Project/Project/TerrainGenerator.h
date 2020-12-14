@@ -5,12 +5,12 @@ class TerrainGenerator
 {
 
 public:
-	bool CubeSolid(float x, float y, float z);
-	float TerrainHeight(float x, float y);
+	bool CubeSolid(float x, float y, float z) const;
+	float TerrainHeight(float x, float y) const;
 
-	float FractalPerlin(float x, float y, int itter);
+	float FractalPerlin(float x, float y, int itter = 8) const;
 
-	float Perlin(float x, float y, float amplitude, float frequency, float xOffset, float yOffset);
+	float Perlin(float x, float y, float amplitude, float frequency, float xOffset, float yOffset) const;
 
 
 
