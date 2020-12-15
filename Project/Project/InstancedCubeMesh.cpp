@@ -22,25 +22,27 @@ int InstancedCubeMesh::GetInstanceCount() {
 
 // Initialise instance buffers.
 // Generate and store cube vertices, normals and texture coordinates
-void InstancedCubeMesh::initBuffers( ID3D11Device* device, XMFLOAT3* p, int count ) {
+void InstancedCubeMesh::initBuffers( ID3D11Device* device, std::vector<XMFLOAT3>const & data) {
 	if( m_instanceBuffer != NULL ) {
 		m_instanceBuffer->Release();
 	}
-	InstanceType* instances;
+	std::vector<InstanceType> instances;
+
 	D3D11_BUFFER_DESC instanceBufferDesc;
 	D3D11_SUBRESOURCE_DATA instanceData;
 
 	// Set the number of instances in the array.
-	m_instanceCount = count;
+	m_instanceCount = data.size();
 	int rt = cbrt( m_instanceCount );
 
 	// Create the instance array.
-	instances = new InstanceType[m_instanceCount];
+	instances.resize(m_instanceCount);
 
 	// Load the instance array with data.
 	for( int inst = 0; inst < m_instanceCount; inst++ ) {
-		instances[inst].position = p[inst];
+		instances.at(inst).position = data.at(inst);
 	}
+
 
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -51,7 +53,7 @@ void InstancedCubeMesh::initBuffers( ID3D11Device* device, XMFLOAT3* p, int coun
 	instanceBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the instance data.
-	instanceData.pSysMem = instances;
+	instanceData.pSysMem = instances.data();
 	instanceData.SysMemPitch = 0;
 	instanceData.SysMemSlicePitch = 0;
 
@@ -59,8 +61,8 @@ void InstancedCubeMesh::initBuffers( ID3D11Device* device, XMFLOAT3* p, int coun
 	device->CreateBuffer( &instanceBufferDesc, &instanceData, &m_instanceBuffer );
 	
 	// Release the instance array now that the instance buffer has been created and loaded.
-	delete[] instances;
-	instances = 0;
+	//delete[] instances;
+	//instances = 0;
 }
 
 // Sends geometry data to the GPU. Default primitive topology is TriangleList.
