@@ -86,10 +86,10 @@ void ChunkManager::LoadChunks(const int renderDistance)
 
 	}
 
-	for (auto& chunkPair : chunksMap) // deactiveate all chunks, unload old chunks
-	{
-		chunkPair.second.UnloadIfInactive();
-	}
+	//for (auto& chunkPair : chunksMap) // deactiveate all chunks, unload old chunks
+	//{
+	//	chunkPair.second.UnloadIfInactive();
+	//}
 
 	if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
 		CleanupChunks();
@@ -117,4 +117,17 @@ void ChunkManager::CleanupChunks()
 	//		[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
 	//	chunksMap.end()
 	//);
+	//https://www.fluentcpp.com/2018/09/21/remove-elements-associative-container-cpp/
+	for (auto ittr = chunksMap.begin(); ittr != chunksMap.end();)
+	{
+		if (!ittr->second.IsActive())
+		{
+			ittr = chunksMap.erase(ittr);
+		}
+		else
+		{
+			++ittr;
+		}
+	}
 }
+

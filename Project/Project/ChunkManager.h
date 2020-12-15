@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include <map>
 
-constexpr int MAXCHUNKSINMEMORY = 250;
+constexpr int MAXCHUNKSINMEMORY = 256;
 
 class ChunkManager
 {
@@ -52,6 +52,7 @@ private:
 
 
 	std::map<size_t, Chunk> chunksMap;
+	std::map<size_t, Chunk&> activeChunks;
 
 };
 
