@@ -18,7 +18,7 @@ private:
 
 	struct ChunkHasher
 	{
-		std::size_t operator()(const XMFLOAT3& vec) const
+		std::size_t operator()(XMFLOAT3 const& vec) const
 		{
 			return std::hash<float>()(
 				vec.x + (std::hash<float>()(
@@ -29,7 +29,7 @@ private:
 	}chunkHasher;
 
 	void LoadChunks(XMFLOAT3 const& location, const int renderDistance);
-	void SendActiveChunksToRender();
+	void GetActiveChunkData();
 
 	void CleanupChunks();
 	

@@ -9,11 +9,9 @@ ChunkManager::ChunkManager()
 void ChunkManager::UpdateChunksRendered(XMFLOAT3 const& atChunkLocation, const int renderDistance)
 {
 	LoadChunks(atChunkLocation, renderDistance);
-	SendActiveChunksToRender();
-
 }
 
-void ChunkManager::SendActiveChunksToRender()
+void ChunkManager::GetActiveChunkData()
 {
 	;
 }

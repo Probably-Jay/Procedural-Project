@@ -67,9 +67,6 @@ bool App1::frame()
 
 
 //
-//void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
-//{
-//
 //void App1::LoadChunk(XMFLOAT3 chunkCords) {
 //
 //	const int width = 64;
@@ -125,10 +122,14 @@ bool App1::frame()
 //
 //	//SendChunks(pos, instanceCount);
 ////}
-//	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
-//
-//
-//}
+
+void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
+{
+
+	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
+
+
+}
 
 bool App1::render()
 {
