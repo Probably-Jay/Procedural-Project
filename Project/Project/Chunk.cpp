@@ -42,8 +42,14 @@ void Chunk::Activate()
 void Chunk::Deactivate()
 {
 	chunkActive = false;
-	chunkInactiveCount++; // count calls to deactivate
-	if (chunkLoaded && chunkInactiveCount > INACTIVITYUNLOADTHRESHOLD) { // if over threshhold, unload chunk data from memory
+	//chunkInactiveCount++; // count calls to deactivate
+	//if (chunkLoaded && chunkInactiveCount > INACTIVITYUNLOADTHRESHOLD) { // if over threshhold, unload chunk data from memory
+	//	UnloadChunk();
+	//}
+}
+void Chunk::UnloadIfInactive()
+{
+	if (chunkLoaded && !chunkActive) {
 		UnloadChunk();
 	}
 }
@@ -67,14 +73,14 @@ void Chunk::GenerateChunk() {
 
 	chunkData->clear();
 	chunkData->reserve(MAXCHNKCAPACITY);
-
+	
 
 	for (int i = 0; i < MAXCHNKCAPACITY; i++) {
 
-		float x = BLOCKSIZE * (i % CHUNKWIDTH);
-		float z = BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
+		float x = worldspaceCords.x + BLOCKSIZE * (i % CHUNKWIDTH);
+		float z = worldspaceCords.y + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
 
-		float y = BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
+		float y = worldspaceCords.z + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
 
 		bool solid = (
 			generator.CubeSolid(x, y, z) // we should be solid
@@ -88,7 +94,7 @@ void Chunk::GenerateChunk() {
 				)); // this is a lot of noise calls but this should short-circuit most of the time
 
 		if (solid) {
-			chunkData->push_back(XMFLOAT3(worldspaceCords.x + x, worldspaceCords.y + y, worldspaceCords.z + z));
+			chunkData->push_back(XMFLOAT3( x,  y, z));
 		}
 	}
 	chunkData->shrink_to_fit();

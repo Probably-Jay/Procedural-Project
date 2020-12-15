@@ -44,8 +44,6 @@ void InstancedCubeMesh::initBuffers( ID3D11Device* device, std::vector<XMFLOAT3>
 	}
 
 
-
-
 	// Set up the description of the instance buffer.
 	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	instanceBufferDesc.ByteWidth = sizeof( InstanceType ) * m_instanceCount;
@@ -55,7 +53,7 @@ void InstancedCubeMesh::initBuffers( ID3D11Device* device, std::vector<XMFLOAT3>
 	instanceBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the instance data.
-	instanceData.pSysMem = &instances;
+	instanceData.pSysMem = instances.data();
 	instanceData.SysMemPitch = 0;
 	instanceData.SysMemSlicePitch = 0;
 

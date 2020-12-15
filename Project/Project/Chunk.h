@@ -5,7 +5,7 @@
 #include "TerrainGenerator.h"
 
 constexpr int BLOCKSIZE = 2;
-constexpr int CHUNKWIDTH = 64;
+constexpr int CHUNKWIDTH = 16;
 constexpr int MAXCHNKCAPACITY = CHUNKWIDTH * CHUNKWIDTH * CHUNKWIDTH;
 constexpr int INACTIVITYUNLOADTHRESHOLD = 25;
 
@@ -22,6 +22,8 @@ public:
 
 	void Activate();
 	void Deactivate();
+
+	void UnloadIfInactive();
 	
 	//inline bool IsLoaded() const { return chunkLoaded; };
 

@@ -17,7 +17,7 @@ public:
 
 	float amplitude = 32;
 	float frequency = 1.f / 128;
-	float groundLevel = 48;
+	float groundLevel = 8;
 
 };
 

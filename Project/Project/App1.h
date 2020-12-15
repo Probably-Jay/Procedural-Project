@@ -21,6 +21,8 @@ public:
 
 	bool frame();
 
+	void Update();
+
 protected:
 	bool render();
 	void gui();

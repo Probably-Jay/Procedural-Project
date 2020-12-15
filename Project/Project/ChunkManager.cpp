@@ -1,38 +1,69 @@
 #include "ChunkManager.h"
 
 ChunkManager::ChunkManager() 
-	: currentChunkCords({0,0,0}) 
+	: currentChunkCords({-1,-1,-1}) 
 {
 
 }
 
-void ChunkManager::UpdateChunksRendered(XMFLOAT3 const& atChunkLocation, const int renderDistance)
+bool ChunkManager::UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance)
 {
-	LoadChunks(atChunkLocation, renderDistance);
+	const XMFLOAT3 chunkCords = WorldCordsToChunkCords(worldCords);
+	if (InChunkLoaded(chunkCords)) {
+		return false; // not changed chunk
+	}
+	else {
+		currentChunkCords = chunkCords;
+		LoadChunks(renderDistance);
+		return true;
+	}
+}
+
+const DirectX::XMFLOAT3 ChunkManager::WorldCordsToChunkCords(const DirectX::XMFLOAT3& worldCords)const
+{
+
+	XMFLOAT3 chunkCords{ 0,0,0 };
+	chunkCords.x = floorf(worldCords.x / (float)CHUNKWIDTH);
+	chunkCords.y = floorf(worldCords.y / (float)CHUNKWIDTH);
+	chunkCords.z = floorf(worldCords.z / (float)CHUNKWIDTH);
+
+	return chunkCords;
+}
+
+bool ChunkManager::InChunkLoaded(XMFLOAT3 const& atChunkLocation)const
+{
+	return currentChunkCords.x == atChunkLocation.x
+	&& currentChunkCords.y == atChunkLocation.y
+	&& currentChunkCords.z == atChunkLocation.z;
+	
 }
 
 const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 {
 	int size = 0;
 	for (auto& chunkPair : chunksMap) {
-		size += chunkPair.second.GetChunkData().size();
+		if (chunkPair.second.IsActive()) {
+			size += chunkPair.second.GetChunkData().size();
+		}
 	} // calculate size for reserving
 
 	vector<XMFLOAT3> data;
 	data.reserve(size);
 
 	for (auto& chunkPair : chunksMap) {
-		auto tempChunk = chunkPair.second.GetChunkData();
-		data.insert(data.end(), tempChunk.begin(), tempChunk.end());
+		if (chunkPair.second.IsActive()) {
+			auto tempChunk = chunkPair.second.GetChunkData();
+			data.insert(data.end(), tempChunk.begin(), tempChunk.end());
+		}
 	} //concatenate data
 
 
 	return data;
 }
 
-void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDistance)
+void ChunkManager::LoadChunks(const int renderDistance)
 {
-	const int loadedChunks = renderDistance * renderDistance;
+	//const int loadedChunks = renderDistance * renderDistance;
 	//nst int positionOffset = render;
 
 
@@ -41,10 +72,10 @@ void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDis
 		chunkPair.second.Deactivate();
 	}
 
-	if(renderDistance > 1){
+	if(renderDistance > 0){
 		// for all chunks visible
-		for (int xChunkOffset = -renderDistance / (int)2; xChunkOffset < renderDistance / (int)2; xChunkOffset++) {
-			for (int zChunkOffset = -renderDistance / (int)2; zChunkOffset < renderDistance / (int)2; zChunkOffset++) {
+		for (int xChunkOffset = -renderDistance; xChunkOffset < renderDistance; xChunkOffset++) {
+			for (int zChunkOffset = -renderDistance; zChunkOffset < renderDistance ; zChunkOffset++) {
 
 				XMFLOAT3 cords = { xChunkOffset + currentChunkCords.x, currentChunkCords.y,zChunkOffset + currentChunkCords.z };
 
@@ -57,6 +88,11 @@ void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDis
 
 		LoadChunkAt(cords);
 
+	}
+
+	for (auto& chunkPair : chunksMap) // deactiveate all chunks, unload old chunks
+	{
+		chunkPair.second.UnloadIfInactive();
 	}
 
 	if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some

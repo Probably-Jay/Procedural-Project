@@ -10,8 +10,9 @@ class ChunkManager
 public:
 	ChunkManager();
 
-	void UpdateChunksRendered(XMFLOAT3 const& atLocation, const int renderDistance);
+	bool UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance);
 
+	inline XMFLOAT3 GetCurrentChunkCords()const { return currentChunkCords; };
 
 	const vector<XMFLOAT3> GetActiveChunkData()const;
 
@@ -31,7 +32,11 @@ private:
 		}
 	}chunkHasher;
 
-	void LoadChunks(XMFLOAT3 const& location, const int renderDistance);
+	const DirectX::XMFLOAT3 WorldCordsToChunkCords(const DirectX::XMFLOAT3& worldCords)const;
+
+	bool InChunkLoaded(XMFLOAT3 const& atChunkLocation)const;
+
+	void LoadChunks(const int renderDistance);
 
 	void LoadChunkAt(DirectX::XMFLOAT3& cords);
 
