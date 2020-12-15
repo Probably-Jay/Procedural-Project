@@ -64,68 +64,71 @@ bool App1::frame()
 
 	return true;
 }
-void App1::LoadChunk(XMFLOAT3 chunkCords) {
-
-	const int width = 64;
-	const int maxCubes = width * width * width;
-
-	//XMFLOAT3* pos = new XMFLOAT3[maxCubes];
-
-	//XMFLOAT3 origin = { -width / 2,-64,-width / 2 };
-	XMFLOAT3 origin = {0,0,0};
-
-	int instanceCount = 0;
-	//Create two crossing sine waves and only draw the cubes that are under the "height" value
-	for (int i = 0; i < maxCubes; i++) {
-
-		float x = 2* (i % width);
-		float z = 2 * ((i / (int)width) % width);
-
-		float y = 2*(i / (int)(width * width));
-
-		bool solid = (
-			gen.CubeSolid(x, y, z) // we should be solid
-			&& 
-			( // we are visible
-				!gen.CubeSolid(x, y + 2, z) || // above
-				!gen.CubeSolid(x - 2, y, z) || // left
-				!gen.CubeSolid(x + 2, y, z) || // right
-				!gen.CubeSolid(x, y, z + 2) || // behind
-				!gen.CubeSolid(x, y, z - 2)    // infront
-			)); // this is a lot of calls but this should short - circuit most of the time
-		
-		if (solid) {
-			pos[instanceCount] = XMFLOAT3(origin.x + x,origin.y +  y,origin.z + z);
-			instanceCount++;
-		}
-
-	}
-	//
-	////Create two crossing sine waves and only draw the cubes that are under the "height" value
-	//for (int i = 0; i < maxCubes; i++) {
-	//	float y1 = sin((float)(i % width) / 8.0f);
-	//	y1 += 1.0f;
-	//	y1 *= 16.f;
-
-	//	float y2 = sin((float)(i / (width * width)) / 4.0f);
-	//	y2 += 1.0f;
-	//	y2 *= 16.f;
-
-	//	if ((i / width) % width < y1 && (i / width) % width < y2) {
-	//		pos[instanceCount] = XMFLOAT3(2.0f * (i % width), 2.0f * ((i / width) % width), 2.0f * (i / (width * width)));
-	//		instanceCount++;
-	//	}
-	//}
-
-	SendChunks(pos, instanceCount);
-}
-
-void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
-{
-	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
 
 
-}
+//
+//void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
+//{
+//
+//void App1::LoadChunk(XMFLOAT3 chunkCords) {
+//
+//	const int width = 64;
+//	const int maxCubes = width * width * width;
+//
+//	//XMFLOAT3* pos = new XMFLOAT3[maxCubes];
+//
+//	//XMFLOAT3 origin = { -width / 2,-64,-width / 2 };
+//	XMFLOAT3 origin = {0,0,0};
+//
+//	int instanceCount = 0;
+//	//Create two crossing sine waves and only draw the cubes that are under the "height" value
+//	for (int i = 0; i < maxCubes; i++) {
+//
+//		float x = 2* (i % width);
+//		float z = 2 * ((i / (int)width) % width);
+//
+//		float y = 2*(i / (int)(width * width));
+//
+//		bool solid = (
+//			gen.CubeSolid(x, y, z) // we should be solid
+//			&& 
+//			( // we are visible
+//				!gen.CubeSolid(x, y + 2, z) || // above
+//				!gen.CubeSolid(x - 2, y, z) || // left
+//				!gen.CubeSolid(x + 2, y, z) || // right
+//				!gen.CubeSolid(x, y, z + 2) || // behind
+//				!gen.CubeSolid(x, y, z - 2)    // infront
+//			)); // this is a lot of calls but this should short - circuit most of the time
+//		
+//		if (solid) {
+//			pos[instanceCount] = XMFLOAT3(origin.x + x,origin.y +  y,origin.z + z);
+//			instanceCount++;
+//		}
+//
+//	}
+//	//
+//	////Create two crossing sine waves and only draw the cubes that are under the "height" value
+//	//for (int i = 0; i < maxCubes; i++) {
+//	//	float y1 = sin((float)(i % width) / 8.0f);
+//	//	y1 += 1.0f;
+//	//	y1 *= 16.f;
+//
+//	//	float y2 = sin((float)(i / (width * width)) / 4.0f);
+//	//	y2 += 1.0f;
+//	//	y2 *= 16.f;
+//
+//	//	if ((i / width) % width < y1 && (i / width) % width < y2) {
+//	//		pos[instanceCount] = XMFLOAT3(2.0f * (i % width), 2.0f * ((i / width) % width), 2.0f * (i / (width * width)));
+//	//		instanceCount++;
+//	//	}
+//	//}
+//
+//	//SendChunks(pos, instanceCount);
+////}
+//	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
+//
+//
+//}
 
 bool App1::render()
 {

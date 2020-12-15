@@ -7,22 +7,31 @@
 constexpr int BLOCKSIZE = 2;
 constexpr int CHUNKWIDTH = 64;
 constexpr int MAXCHNKCAPACITY = CHUNKWIDTH * CHUNKWIDTH * CHUNKWIDTH;
+constexpr int INACTIVITYUNLOADTHRESHOLD = 25;
+
 class Chunk
 {
 public:
 	//static const int CHUNKWIDTH = { 64 };
 
 	Chunk(size_t const id, XMFLOAT3 const chunkCords, TerrainGenerator const & gen);
-	void UnloadChunk();
-	void ReLoadChunk();
+
+	inline bool IsActive() const { return chunkActive; };
 	
-	inline bool IsLoaded() const { return chunkLoaded; };
+	//inline bool MarkedForCleanUp() { return chunkInactiveCount > INACTIVITYDESTRUCTIONTHRESHOLD; };
+
+	void Activate();
+	void Deactivate();
+	
+	//inline bool IsLoaded() const { return chunkLoaded; };
 
 	const std::size_t chunkID;
 
 
 
 private:
+	void UnloadChunk();
+	void LoadChunk();
 
 	TerrainGenerator const & generator;
 
@@ -32,6 +41,9 @@ private:
 	void GenerateChunk();
 
 	bool chunkLoaded = false;
+	
+	bool chunkActive = false;
+	int chunkInactiveCount = 0;
 	
 	std::unique_ptr<vector<XMFLOAT3>> chunkData;
 

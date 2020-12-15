@@ -1,6 +1,7 @@
 #include "ChunkManager.h"
 
-ChunkManager::ChunkManager()
+ChunkManager::ChunkManager() 
+	: currentChunkCords({0,0,0}) 
 {
 
 }
@@ -8,6 +9,13 @@ ChunkManager::ChunkManager()
 void ChunkManager::UpdateChunksRendered(XMFLOAT3 const& atChunkLocation, const int renderDistance)
 {
 	LoadChunks(atChunkLocation, renderDistance);
+	SendActiveChunksToRender();
+
+}
+
+void ChunkManager::SendActiveChunksToRender()
+{
+	;
 }
 
 void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDistance)
@@ -15,23 +23,39 @@ void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDis
 	const int loadedChunks = renderDistance * renderDistance;
 	//nst int positionOffset = render;
 
+
+	for (auto  & chunkPair : chunksMap ) // deactiveate all chunks, unload old chunks
+	{
+		chunkPair.second.Deactivate();
+	}
+
+	// for all chunks visible
 	for (int xChunkOffset = -renderDistance / 2; xChunkOffset < renderDistance / 2; xChunkOffset++) {
 		for (int zChunkOffset = -renderDistance / 2; zChunkOffset < renderDistance / 2; zChunkOffset++) {
 			XMFLOAT3 cords = { xChunkOffset + currentChunkCords.x, currentChunkCords.y,zChunkOffset + currentChunkCords.z };
 			auto id = chunkHasher(cords);
 
-			auto matches = chunksMap.count(id);
-
-			if (matches == 0) {
-
-			}
-			else if (matches == 1) {
-
-			}
-			else {
-				// hash colllision, idk
+			if (chunksMap.count(id) == 0) { // does not exist, add it
+				chunksMap.emplace(std::pair<std::size_t,Chunk>(id, Chunk(id, cords, generator)));
 			}
 			
+			chunksMap.at(id).Activate(); // activate chunk
 		}
 	}
+
+	if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
+		CleanupChunks();
+	}
+
+}
+
+void ChunkManager::CleanupChunks()
+{
+	chunksMap.erase(
+		std::remove_if(
+			chunksMap.begin(),
+			chunksMap.end(),
+			[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
+		chunksMap.end()
+	);
 }

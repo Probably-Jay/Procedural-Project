@@ -2,12 +2,16 @@
 #include "DXF.h"	// include dxframework
 #include "Chunk.h"
 #include <map>
+
+constexpr int MAXCHUNKSINMEMORY = 250;
+
 class ChunkManager
 {
 public:
 	ChunkManager();
 
 	void UpdateChunksRendered(XMFLOAT3 const& atLocation, const int renderDistance);
+
 
 
 private:
@@ -25,10 +29,16 @@ private:
 	}chunkHasher;
 
 	void LoadChunks(XMFLOAT3 const& location, const int renderDistance);
+	void SendActiveChunksToRender();
+
+	void CleanupChunks();
 	
 	XMFLOAT3 currentChunkCords;
 
 	std::vector<Chunk> chunks;
+
+	TerrainGenerator generator;
+
 
 
 	std::map<size_t, Chunk> chunksMap;

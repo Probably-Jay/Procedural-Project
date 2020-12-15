@@ -17,12 +17,41 @@ void Chunk::UnloadChunk()
 	}
 }
 
-void Chunk::ReLoadChunk()
+void Chunk::LoadChunk()
 {
 	if (!chunkLoaded) {
 		GenerateChunk();
 	}
 }
+
+void Chunk::Activate()
+{
+	chunkActive = true;
+	chunkInactiveCount = 0; // reset chunk inactive count
+	LoadChunk(); // load chunk if not already loaded
+	
+}
+
+void Chunk::Deactivate()
+{
+	chunkActive = false;
+	chunkInactiveCount++; // count calls to deactivate
+	if (chunkLoaded && chunkInactiveCount > INACTIVITYUNLOADTHRESHOLD) { // if over threshhold, unload chunk data from memory
+		UnloadChunk();
+	}
+}
+//
+//void Chunk::SetActive(bool active)
+//{
+//	chunkActive = active;
+//
+//	if (chunkActive) {
+//		chunkLoadsSinceActive = 0;
+//	}
+//	else {
+//		chunkLoadsSinceActive++;
+//	}
+//}
 
 
 
