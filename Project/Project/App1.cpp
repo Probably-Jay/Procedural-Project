@@ -23,9 +23,11 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light->setDirection(0.578f, -0.578f, 0.578f);
 
 	auto cPos = camera->getPosition();
-	camera->setPosition(cPos.x, gen.TerrainHeight(cPos.x,cPos.z)+5, cPos.y);
+	camera->setPosition(cPos.x, chunkManager.GetTerrainHeight(cPos)+5, cPos.y);
 
-	LoadChunk();
+	//LoadChunk();
+	UpdateChunks();
+
 }
 
 
@@ -54,7 +56,6 @@ bool App1::frame()
 	{
 		return false;
 	}
-	
 	// Render the graphics.
 	result = render();
 	if (!result)
@@ -123,10 +124,11 @@ bool App1::frame()
 //	//SendChunks(pos, instanceCount);
 ////}
 
-void App1::SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount)
+void App1::UpdateChunks()
 {
+	chunkManager.UpdateChunksRendered(camera->getPosition(),1);
 
-	m_InstancedCube->initBuffers(renderer->getDevice(), pos, instanceCount);
+	m_InstancedCube->initBuffers(renderer->getDevice(), chunkManager.GetActiveChunkData());
 
 
 }

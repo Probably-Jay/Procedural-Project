@@ -14,7 +14,7 @@ class Chunk
 public:
 	//static const int CHUNKWIDTH = { 64 };
 
-	Chunk(size_t const id, XMFLOAT3 const chunkCords, TerrainGenerator const & gen);
+	Chunk(size_t const id, XMFLOAT3 const& chunkCords, TerrainGenerator const & gen);
 
 	inline bool IsActive() const { return chunkActive; };
 	
@@ -27,7 +27,7 @@ public:
 
 	const std::size_t chunkID;
 
-
+	std::vector<XMFLOAT3> const& GetChunkData()const;
 
 private:
 	void UnloadChunk();
@@ -46,6 +46,7 @@ private:
 	int chunkInactiveCount = 0;
 	
 	std::unique_ptr<vector<XMFLOAT3>> chunkData;
+	//vector<XMFLOAT3> * chunkData;
 
 };
 

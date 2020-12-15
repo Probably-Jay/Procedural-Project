@@ -1,16 +1,16 @@
 #include "TerrainGenerator.h"
 
-bool TerrainGenerator::CubeSolid(float x, float y, float z) const
+const bool TerrainGenerator::CubeSolid(float x, float y, float z) const
 {
-	return y < TerrainHeight(x, z);
+	return y < GetTerrainHeight(x, z);
 }
 
-float TerrainGenerator::TerrainHeight(float x, float z)const
+const float TerrainGenerator::GetTerrainHeight(float x, float z)const
 {
 	return groundLevel + FractalPerlin(x,z);
 }
 
-float TerrainGenerator::FractalPerlin(float x, float z, int itter)const
+const float TerrainGenerator::FractalPerlin(float x, float z, int itter)const
 {
 	float ampl = amplitude;
 	float freq = frequency;
@@ -25,7 +25,7 @@ float TerrainGenerator::FractalPerlin(float x, float z, int itter)const
 }
 
 
-float TerrainGenerator::Perlin(float x, float z, float amplitude, float frequency, float xOffset, float zOffset)const
+const float TerrainGenerator::Perlin(float x, float z, float amplitude, float frequency, float xOffset, float zOffset)const
 {
 	 return PerlinNoise::Perlin(x * frequency + xOffset, z * frequency + zOffset) * amplitude;
 }

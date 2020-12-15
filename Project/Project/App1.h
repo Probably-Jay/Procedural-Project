@@ -6,11 +6,10 @@
 #include "DXF.h"	// include dxframework
 #include "InstanceShader.h"
 #include "InstancedCubeMesh.h"
-#include "TerrainGenerator.h"
+//#include "TerrainGenerator.h"
 #include <map>
-#include <hash_map>
 #include <unordered_map>
-
+#include "ChunkManager.h"
 
 class App1 : public BaseApplication
 {
@@ -27,16 +26,17 @@ protected:
 	void gui();
 
 private:
-	void LoadChunk(XMFLOAT3 chunkCords);
+//	void LoadChunk(XMFLOAT3 chunkCords);
 
-	void SendChunks(DirectX::XMFLOAT3*& pos, int instanceCount);
+	void UpdateChunks();
 
 	InstanceShader* m_InstanceShader;
 	InstancedCubeMesh* m_InstancedCube;
 
 	Light* light;
 
-	TerrainGenerator gen;
+	//TerrainGenerator gen;
+	ChunkManager chunkManager;
 
 	static const int chunkWidth = { 64 };
 

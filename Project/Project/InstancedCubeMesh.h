@@ -10,6 +10,9 @@
 #pragma once
 
 #include "CubeMesh.h"
+#include <map>
+#include <array>
+#include <vector>
 
 class InstancedCubeMesh : public CubeMesh {
 
@@ -25,7 +28,7 @@ public:
 
 	int GetInstanceCount();
 
-	void initBuffers( ID3D11Device* device, XMFLOAT3* p, int count );
+	void initBuffers( ID3D11Device* device, std::vector<XMFLOAT3>const& data);
 	void sendDataInstanced( ID3D11DeviceContext* deviceContext, D3D_PRIMITIVE_TOPOLOGY top = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 protected:

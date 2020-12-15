@@ -1,12 +1,19 @@
 #include "Chunk.h"
 
-Chunk::Chunk(size_t const id, XMFLOAT3 const chunkCords, TerrainGenerator const& gen)
+Chunk::Chunk(size_t const id, XMFLOAT3 const& chunkCords, TerrainGenerator const& gen)
 	: chunkspaceCords(chunkCords)
 	, worldspaceCords(XMFLOAT3{ chunkspaceCords.x * CHUNKWIDTH,0, chunkspaceCords.z * CHUNKWIDTH })
 	, generator(gen)
 	, chunkID(id)
 {
 	chunkData = std::make_unique<vector<XMFLOAT3>>();
+	//chunkData = std::unique_ptr<vector<XMFLOAT3>>(new vector<XMFLOAT3>());
+	//chunkData = new vector<XMFLOAT3>();
+}
+
+std::vector<XMFLOAT3> const & Chunk::GetChunkData()const
+{
+	return *chunkData;
 }
 
 void Chunk::UnloadChunk()

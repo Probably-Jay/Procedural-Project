@@ -13,6 +13,9 @@ public:
 	void UpdateChunksRendered(XMFLOAT3 const& atLocation, const int renderDistance);
 
 
+	const vector<XMFLOAT3> GetActiveChunkData()const;
+
+	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator.GetTerrainHeight(pos.x,pos.z); };
 
 private:
 
@@ -29,7 +32,8 @@ private:
 	}chunkHasher;
 
 	void LoadChunks(XMFLOAT3 const& location, const int renderDistance);
-	void GetActiveChunkData();
+
+	void LoadChunkAt(DirectX::XMFLOAT3& cords);
 
 	void CleanupChunks();
 	

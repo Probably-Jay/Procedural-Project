@@ -11,9 +11,23 @@ void ChunkManager::UpdateChunksRendered(XMFLOAT3 const& atChunkLocation, const i
 	LoadChunks(atChunkLocation, renderDistance);
 }
 
-void ChunkManager::GetActiveChunkData()
+const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 {
-	;
+	int size = 0;
+	for (auto& chunkPair : chunksMap) {
+		size += chunkPair.second.GetChunkData().size();
+	} // calculate size for reserving
+
+	vector<XMFLOAT3> data;
+	data.reserve(size);
+
+	for (auto& chunkPair : chunksMap) {
+		auto tempChunk = chunkPair.second.GetChunkData();
+		data.insert(data.end(), tempChunk.begin(), tempChunk.end());
+	} //concatenate data
+
+
+	return data;
 }
 
 void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDistance)
@@ -27,18 +41,22 @@ void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDis
 		chunkPair.second.Deactivate();
 	}
 
-	// for all chunks visible
-	for (int xChunkOffset = -renderDistance / 2; xChunkOffset < renderDistance / 2; xChunkOffset++) {
-		for (int zChunkOffset = -renderDistance / 2; zChunkOffset < renderDistance / 2; zChunkOffset++) {
-			XMFLOAT3 cords = { xChunkOffset + currentChunkCords.x, currentChunkCords.y,zChunkOffset + currentChunkCords.z };
-			auto id = chunkHasher(cords);
+	if(renderDistance > 1){
+		// for all chunks visible
+		for (int xChunkOffset = -renderDistance / (int)2; xChunkOffset < renderDistance / (int)2; xChunkOffset++) {
+			for (int zChunkOffset = -renderDistance / (int)2; zChunkOffset < renderDistance / (int)2; zChunkOffset++) {
 
-			if (chunksMap.count(id) == 0) { // does not exist, add it
-				chunksMap.emplace(std::pair<std::size_t,Chunk>(id, Chunk(id, cords, generator)));
+				XMFLOAT3 cords = { xChunkOffset + currentChunkCords.x, currentChunkCords.y,zChunkOffset + currentChunkCords.z };
+
+				LoadChunkAt(cords);
 			}
-			
-			chunksMap.at(id).Activate(); // activate chunk
 		}
+	}
+	else {
+		XMFLOAT3 cords = {currentChunkCords.x, currentChunkCords.y,currentChunkCords.z };
+
+		LoadChunkAt(cords);
+
 	}
 
 	if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
@@ -47,13 +65,24 @@ void ChunkManager::LoadChunks(XMFLOAT3 const& chunkLocation, const int renderDis
 
 }
 
+void ChunkManager::LoadChunkAt(DirectX::XMFLOAT3& cords)
+{
+	auto id = chunkHasher(cords);
+
+	if (chunksMap.count(id) == 0) { // does not exist, add it
+		chunksMap.emplace(std::pair<std::size_t, Chunk>(id, Chunk(id, cords, generator)));
+	}
+
+	chunksMap.at(id).Activate(); // activate chunk
+}
+
 void ChunkManager::CleanupChunks()
 {
-	chunksMap.erase(
+	/*chunksMap.erase(
 		std::remove_if(
 			chunksMap.begin(),
 			chunksMap.end(),
 			[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
 		chunksMap.end()
-	);
+	);*/
 }
