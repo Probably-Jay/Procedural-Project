@@ -132,7 +132,7 @@ void App1::Update()
 
 void App1::UpdateChunks()
 {
-	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(),0);
+	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(),2);
 
 	if (changedChunk) {
 		m_InstancedCube->initBuffers(renderer->getDevice(), chunkManager.GetActiveChunkData());
@@ -180,7 +180,7 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-	ImGui::Text("Chunk Cord: (%.2f, %.2f, %.2f)", chunkManager.GetCurrentChunkCords().x, chunkManager.GetCurrentChunkCords().y, chunkManager.GetCurrentChunkCords().z);
+	ImGui::Text("Chunk Cord: (%i, %i)", chunkManager.GetCurrentChunkCords().x, chunkManager.GetCurrentChunkCords().y);
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 
 	// Render UI

@@ -1,14 +1,14 @@
 #include "ChunkManager.h"
 
 ChunkManager::ChunkManager() 
-	: currentChunkCords({-1,-1,-1}) 
+	: currentChunkCords({-1,-1}) 
 {
 
 }
 
 bool ChunkManager::UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance)
 {
-	const XMFLOAT3 chunkCords = WorldCordsToChunkCords(worldCords);
+	const XMINT2 chunkCords = WorldCordsToChunkCords(worldCords);
 	if (InChunkLoaded(chunkCords)) {
 		return false; // not changed chunk
 	}
@@ -19,22 +19,19 @@ bool ChunkManager::UpdateChunksRendered(XMFLOAT3 const& worldCords, const int re
 	}
 }
 
-const DirectX::XMFLOAT3 ChunkManager::WorldCordsToChunkCords(const DirectX::XMFLOAT3& worldCords)const
+const XMINT2 ChunkManager::WorldCordsToChunkCords(const XMFLOAT3& worldCords)const
 {
 
-	XMFLOAT3 chunkCords{ 0,0,0 };
-	chunkCords.x = floorf(worldCords.x / (float)CHUNKWIDTH);
-	chunkCords.y = floorf(worldCords.y / (float)CHUNKWIDTH);
-	chunkCords.z = floorf(worldCords.z / (float)CHUNKWIDTH);
+	XMINT2 chunkCords{ 0,0 };
+	chunkCords.x = floorf( worldCords.x / (float)(BLOCKSIZE * CHUNKWIDTH));
+	chunkCords.y = floorf(worldCords.z / (float)(BLOCKSIZE * CHUNKWIDTH));
 
 	return chunkCords;
 }
 
-bool ChunkManager::InChunkLoaded(XMFLOAT3 const& atChunkLocation)const
+bool ChunkManager::InChunkLoaded(XMINT2 const& atChunkLocation)const
 {
-	return currentChunkCords.x == atChunkLocation.x
-	&& currentChunkCords.y == atChunkLocation.y
-	&& currentChunkCords.z == atChunkLocation.z;
+	return currentChunkCords.x == atChunkLocation.x && currentChunkCords.y == atChunkLocation.y;
 	
 }
 
@@ -71,20 +68,19 @@ void ChunkManager::LoadChunks(const int renderDistance)
 	{
 		chunkPair.second.Deactivate();
 	}
-
 	if(renderDistance > 0){
 		// for all chunks visible
-		for (int xChunkOffset = -renderDistance; xChunkOffset < renderDistance; xChunkOffset++) {
-			for (int zChunkOffset = -renderDistance; zChunkOffset < renderDistance ; zChunkOffset++) {
+		for (int xChunkOffset = -renderDistance; xChunkOffset < renderDistance+1; xChunkOffset++) {
+			for (int zChunkOffset = -renderDistance; zChunkOffset < renderDistance+1 ; zChunkOffset++) {
 
-				XMFLOAT3 cords = { xChunkOffset + currentChunkCords.x, currentChunkCords.y,zChunkOffset + currentChunkCords.z };
+				XMINT2 cords = { xChunkOffset + currentChunkCords.x,zChunkOffset + currentChunkCords.y };
 
 				LoadChunkAt(cords);
 			}
 		}
 	}
 	else {
-		XMFLOAT3 cords = {currentChunkCords.x, currentChunkCords.y,currentChunkCords.z };
+		XMINT2 cords = {currentChunkCords.x,currentChunkCords.y };
 
 		LoadChunkAt(cords);
 
@@ -101,7 +97,7 @@ void ChunkManager::LoadChunks(const int renderDistance)
 
 }
 
-void ChunkManager::LoadChunkAt(DirectX::XMFLOAT3& cords)
+void ChunkManager::LoadChunkAt(XMINT2& cords)
 {
 	auto id = chunkHasher(cords);
 
@@ -114,11 +110,11 @@ void ChunkManager::LoadChunkAt(DirectX::XMFLOAT3& cords)
 
 void ChunkManager::CleanupChunks()
 {
-	/*chunksMap.erase(
-		std::remove_if(
-			chunksMap.begin(),
-			chunksMap.end(),
-			[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
-		chunksMap.end()
-	);*/
+	//chunksMap.erase(
+	//	std::remove_if(
+	//		chunksMap.begin(),
+	//		chunksMap.end(),
+	//		[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
+	//	chunksMap.end()
+	//);
 }

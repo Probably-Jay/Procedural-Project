@@ -12,7 +12,7 @@ public:
 
 	bool UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance);
 
-	inline XMFLOAT3 GetCurrentChunkCords()const { return currentChunkCords; };
+	inline XMINT2 GetCurrentChunkCords()const { return currentChunkCords; };
 
 	const vector<XMFLOAT3> GetActiveChunkData()const;
 
@@ -22,27 +22,28 @@ private:
 
 	struct ChunkHasher
 	{
-		std::size_t operator()(XMFLOAT3 const& vec) const
+		std::size_t operator()(XMINT2 const& vec) const
 		{
-			return std::hash<float>()(
-				vec.x + (std::hash<float>()(
-					vec.y + std::hash<float>() (vec.z))
-					)
-				);
+			/*return std::hash<float>()(vec.x + std::hash<float>()(vec.y + std::hash<float>()(vec.z)));*/
+
+		https://stackoverflow.com/a/65313449/7711148
+			std::hash<int> h;
+
+			return h(h(vec.x) + h(h(vec.y)));
 		}
 	}chunkHasher;
 
-	const DirectX::XMFLOAT3 WorldCordsToChunkCords(const DirectX::XMFLOAT3& worldCords)const;
+	const XMINT2 WorldCordsToChunkCords(const XMFLOAT3& worldCords)const;
 
-	bool InChunkLoaded(XMFLOAT3 const& atChunkLocation)const;
+	bool InChunkLoaded(XMINT2 const& atChunkLocation)const;
 
 	void LoadChunks(const int renderDistance);
 
-	void LoadChunkAt(DirectX::XMFLOAT3& cords);
+	void LoadChunkAt(DirectX::XMINT2& cords);
 
 	void CleanupChunks();
 	
-	XMFLOAT3 currentChunkCords;
+	XMINT2 currentChunkCords;
 
 	std::vector<Chunk> chunks;
 

@@ -1,12 +1,12 @@
 #include "Chunk.h"
 
-Chunk::Chunk(size_t const id, XMFLOAT3 const& chunkCords, TerrainGenerator const& gen)
+Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& gen)
 	: chunkspaceCords(chunkCords)
-	, worldspaceCords(XMFLOAT3{ chunkspaceCords.x * CHUNKWIDTH,0, chunkspaceCords.z * CHUNKWIDTH })
+	, worldspaceCords(XMFLOAT3{ (float)chunkspaceCords.x * CHUNKWIDTH * BLOCKSIZE,0.f, (float)chunkspaceCords.y * CHUNKWIDTH * BLOCKSIZE })
 	, generator(gen)
 	, chunkID(id)
 {
-	chunkData = std::make_unique<vector<XMFLOAT3>>();
+	chunkData = std::make_shared<vector<XMFLOAT3>>();
 	//chunkData = std::unique_ptr<vector<XMFLOAT3>>(new vector<XMFLOAT3>());
 	//chunkData = new vector<XMFLOAT3>();
 }
@@ -78,9 +78,9 @@ void Chunk::GenerateChunk() {
 	for (int i = 0; i < MAXCHNKCAPACITY; i++) {
 
 		float x = worldspaceCords.x + BLOCKSIZE * (i % CHUNKWIDTH);
-		float z = worldspaceCords.y + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
+		float z = worldspaceCords.z + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
 
-		float y = worldspaceCords.z + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
+		float y = worldspaceCords.y + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
 
 		bool solid = (
 			generator.CubeSolid(x, y, z) // we should be solid
