@@ -32,5 +32,6 @@
     <ClInclude Include="StandardAlgorithms.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Chord.h" />
   </ItemGroup>
 </Project>

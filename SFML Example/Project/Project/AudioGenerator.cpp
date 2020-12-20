@@ -78,57 +78,7 @@ void AudioGenerator::FillOverflow()
 void AudioGenerator::Generate()
 {
 	
-	std::vector<float> notes = {
-		  440 * powf(2, 0/12.f)
-		, 440 * powf(2, 2/12.f)
-		, 440 * powf(2, 4/12.f)
-		, 440 * powf(2, 5 / 12.f)
-		, 440 * powf(2, 7/12.f)
-		, 440 * powf(2, 9/12.f)
-		, 440 * powf(2, 11 / 12.f)
-	};
-
-	enum class NoteEnum
-	{
-		A = 0,
-		B,
-		Cs,
-		D,
-		E,
-		Fs,
-		G,
-	};
-
-	enum class ChordsEnum {
-		A,
-		D,
-		E,
-	};
-
-	std::vector<NoteEnum> penta = {
-		NoteEnum::A,
-		NoteEnum::B,
-		NoteEnum::Cs,
-		NoteEnum::E,
-		NoteEnum::Fs,
-	};
-
-	std::vector<NoteEnum> spicy = {
-		NoteEnum::D,
-		NoteEnum::G
-	};
-
-	std::vector<std::vector<float>> chords = {
-		{notes[(int)NoteEnum::A],	notes[(int)NoteEnum::Cs],	notes[(int)NoteEnum::E]},
-		{notes[(int)NoteEnum::D],	notes[(int)NoteEnum::Fs],	notes[(int)NoteEnum::A]},
-		{notes[(int)NoteEnum::E],	notes[(int)NoteEnum::G],	notes[(int)NoteEnum::B]},
-	};
-
-	std::vector<ChordsEnum> Amaj = {
-		ChordsEnum::A,
-		ChordsEnum::D,
-		ChordsEnum::E,
-	};
+	
 
 
 	srand(time(0));
@@ -187,7 +137,7 @@ void AudioGenerator::GenerateSamples(int startSampleIndex, const int samplesPerN
 	{
 		if (i < (attack + decay)) // silence
 		{
-			float audio = SquareWave(index, sinIncrimentValue);
+			float audio = SinWave(index, sinIncrimentValue);
 
 
 			FillSamples(i, attack, decay, audio, envelopeFactor);
