@@ -52,7 +52,7 @@ private:
 
 
 	std::map<size_t, Chunk> chunksMap;
-	std::map<size_t, Chunk&> activeChunks;
+	//std::map<size_t, Chunk&> activeChunks;
 
 };
 
