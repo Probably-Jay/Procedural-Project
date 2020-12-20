@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ProceduralAudioStream.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioGenerator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{2402bd78-09a5-44f6-bc39-5352abda1570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{004a3e4c-3c17-4aee-a2ce-7d8c29f16037}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ProceduralAudioStream.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioGenerator.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="StandardAlgorithms.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
