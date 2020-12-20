@@ -9,6 +9,8 @@
 #include "ProceduralAudioStream.h"
 #include <memory>
 
+#include "Chord.h"
+
 
 int main() {
  
@@ -26,6 +28,10 @@ int main() {
 
 	////GenerateAudio(samples, numberOfSamples);
 	//AudioGenerator * gen = new AudioGenerator();
+
+	
+
+	
 
 	ProceduralAudioStream stream;
 

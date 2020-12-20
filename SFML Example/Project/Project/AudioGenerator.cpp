@@ -15,8 +15,33 @@ AudioGenerator::AudioGenerator()
 	, bufferReady(false)
 	, bufferSent(true) // init both buffers
 	, sampleArray()
+	, mark()
 {
 	hotbufferMutex = std::make_unique<std::mutex>();
+	SetUpMarkov();
+
+}
+
+void AudioGenerator::SetUpMarkov()
+{
+	auto I		= Chord::Function::I;
+	auto ii		= Chord::Function::ii;
+	auto iii	= Chord::Function::iii;
+	auto IV		= Chord::Function::IV;
+	auto V		= Chord::Function::V;
+	auto vi		= Chord::Function::vi;
+	auto viidim	= Chord::Function::viidim;
+
+
+	mark.AddState(I);  
+	mark.AddState(ii); 
+	mark.AddState(iii);
+	mark.AddState(IV); 
+	mark.AddState(V);  
+	mark.AddState(vi); 
+	mark.AddState(viidim);
+
+	mark.AddLink(I,ii,100/6.f)
 
 }
 
@@ -81,7 +106,7 @@ void AudioGenerator::Generate()
 	
 
 
-	srand(time(0));
+	/*srand(time(0));
 	for (size_t i = 0; i < NOTESPERCHUNK; i++)
 	{
 		int index;
@@ -100,18 +125,18 @@ void AudioGenerator::Generate()
 		}
 		
 		
-	}
+	}*/
 
-	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
-	{
-		int index = rand() % Amaj.size();
-		const int noteSize = SAMPLESPERNOTE_s * 4;
-		for (size_t j = 0; j < 3; j++)
-		{
-			GenerateNote(chords[index][j], i * noteSize, noteSize);
+	//for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
+	//{
+	//	int index = rand() % Amaj.size();
+	//	const int noteSize = SAMPLESPERNOTE_s * 4;
+	//	for (size_t j = 0; j < 3; j++)
+	//	{
+	//		GenerateNote(chords[index][j], i * noteSize, noteSize);
 
-		}
-	}
+	//	}
+	//}
 
 
 }

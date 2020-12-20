@@ -20,7 +20,8 @@ public:
 	inline void SetAxiom(T axiom) { currentNode = nodes.at(axiom); };
 
 	inline void AddState(T data) { nodes.insert({ data, make_shared<MarkovNode<T>>(data) }); };
-	inline void AddLink(T from, T to, int probability) { nodes.at(from)->AddLink(nodes.at(to), probability); };
+	inline void AddLink(T from, T to, float probability) { nodes.at(from)->AddLink(nodes.at(to), probability); };
+//	inline void NormaliseProbability(T node,) { nodes.at(node)-> };
 	inline void MarkTerminus(T terminus) { nodes.at(terminus)->MarkTerminus(); };
 
 	

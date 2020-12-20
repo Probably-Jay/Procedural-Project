@@ -14,6 +14,7 @@ ProceduralAudioStream::ProceduralAudioStream()
 	// default values
 	,currentSample(0)
 	,sampleRate(44100)
+	
 {
 	SoundStream::initialize(1, sampleRate);
 	//generatorThread

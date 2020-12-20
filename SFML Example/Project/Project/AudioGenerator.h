@@ -7,6 +7,7 @@
 #include "StandardAlgorithms.h"
 #include <vector>
 #include "MarkovChain.h"
+#include "Chord.h"
 
 constexpr auto PI = 3.1415f;
  
@@ -22,6 +23,8 @@ class AudioGenerator
 {
 public:
 	AudioGenerator();
+
+	void SetUpMarkov();
 
 	//void GenerateAudio(sf::Int16* buffer, const int numberOfSamples);
 	std::unique_ptr<sf::SoundBuffer> LoadFromHotBuffer();
@@ -97,7 +100,7 @@ private:
 	sf::SoundBuffer buffer2;
 
 	
-	//MarkovChain<
+	MarkovChain<Chord::Function> mark;
 
 };
 

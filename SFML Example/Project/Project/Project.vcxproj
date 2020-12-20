@@ -34,6 +34,8 @@
   <ItemGroup>
     <ClInclude Include="Chord.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MarkovChain.h" />
+    <ClInclude Include="MarkovNode.h" />
     <ClInclude Include="ProceduralAudioStream.h" />
     <ClInclude Include="AudioGenerator.h" />
     <ClInclude Include="StandardAlgorithms.h" />

@@ -20,6 +20,8 @@ public:
 
 	void MarkTerminus();
 
+	//void NormaliseProbablility();
+
 private:
 	T payload;
 
@@ -73,3 +75,9 @@ inline void MarkovNode<T>::MarkTerminus()
 	ClearLinks();
 	accumulativeProbablity = 100;
 }
+
+//template<class T>
+//inline void MarkovNode<T>::NormaliseProbablility()
+//{
+//
+//}
