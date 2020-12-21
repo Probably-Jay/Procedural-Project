@@ -6,30 +6,45 @@
 
 struct Chord
 {
+
+	enum class Inversions {
+		Root,
+		FirstInversion,
+		SecondInversion
+	};
+
 	enum class Note
 	{
-		A = 0
-		, As = 1
-		//	, Bb	= 1
-		, B = 2
-		, C = 3
-		, Cs = 4
-		//	, Db	= 4
-		, D = 5
-		, Ds = 6
-		//	, Eb	= 6
-		, E = 7
-		, F = 8
-		, Fs = 9
-		//	, Gb	= 9
-		, G = 10
-		, Gs = 11
-		//	, Ab	= 11
-	};
+		  A		= 0
+		, As	= 1
+		, B		= 2
+		, C		= 3
+		, Cs	= 4
+		, D		= 5
+		, Ds	= 6
+		, E		= 7
+		, F		= 8
+		, Fs	= 9
+		, G		= 10
+		, Gs	= 11
+		
+		/*, A1	= 0		+12
+		, As1	= 1		+12
+		, B1	= 2		+12
+		, C1	= 3		+12
+		, Cs1	= 4		+12
+		, D1	= 5		+12
+		, Ds1	= 6		+12
+		, E1	= 7		+12
+		, F1	= 8		+12
+		, Fs1	= 9		+12
+		, G1	= 10	+12
+		, Gs1	= 11	+12*/
+ 	};
 
 	enum class Chords
 	{
-		AMaj
+		  AMaj
 		, BMin
 		, CsMin
 		, DMaj
@@ -46,7 +61,7 @@ struct Chord
 
 	enum class Function
 	{
-		I
+		  I
 		, ii
 		, iii
 		, IV
@@ -61,16 +76,8 @@ struct Chord
 
 	static const std::map<Function, Chords> functionalAMajor;
 
-	/*static inline std::vector<float> const& ChordFromFunction(Chord::Key key,  Chord::Function function) {
-		switch (key)
-		{
-		case Chord::Key::AMaj:
-			return
-			break;
-		default:
-			break;
-		}
-	};*/
+	static inline float GetNote(Note note, int octave = 0) { return pow(2, octave) * pitches.at(note); };
+	static inline float GetNote(Chords chord, int note, int octave = 0) { return pow(2, octave) * chords.at(chord)[note]; };
 
 	static std::string PrintChord(Chords chord) {
 

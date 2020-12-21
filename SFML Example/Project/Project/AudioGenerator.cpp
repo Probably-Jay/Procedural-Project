@@ -163,19 +163,63 @@ void AudioGenerator::Generate()
 
 	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
 	{
-		//int index = rand() % Amaj.size();
-		auto chordFunction = mark.GetNext();
-		auto chord = Chord::functionalAMajor.at(chordFunction);
-		std::cout << "Chord: " << Chord::PrintChord(chord) << std::endl;
-		const int noteSize = SAMPLESPERNOTE_s * 4;
-		for (size_t j = 0; j < 3; j++)
-		{
-			GenerateNote(Chord::chords.at(chord)[j], i * noteSize, noteSize);
-
-		}
+		GenerateChord(i);
 	}
 
 
+}
+
+void AudioGenerator::GenerateChord(const size_t& i)
+{
+	const auto chordFunction = mark.GetNext();
+	const auto chord = Chord::functionalAMajor.at(chordFunction);
+	std::cout << "Chord: " << Chord::PrintChord(chord) << std::endl;
+
+
+
+	const int noteSize = SAMPLESPERNOTE_s * 4;
+
+	const int inversionChance = rand() % 100;
+	const int seventhChance = rand() % 100;
+	const int octaveChance = rand() % 100;
+
+	int octave;
+	if (octaveChance < 80)
+		octave = 0;
+	else if (octaveChance < 90)
+		octave = 1;
+	else
+		octave = -1;
+
+	std::vector<float> notes;
+
+	if (inversionChance < 80) {  // not inverted
+		for(int i = 0 ; i < 3; i ++)notes.push_back(Chord::GetNote(chord, i, octave));
+	}
+	else if (inversionChance < 90) {  // firstInversion
+		notes.push_back(Chord::GetNote(chord, 0, octave));
+		notes.push_back(Chord::GetNote(chord, 1, octave));
+		notes.push_back(Chord::GetNote(chord, 2, octave -1));
+	}
+	else { // second inversion
+		notes.push_back(Chord::GetNote(chord, 0, octave));
+		notes.push_back(Chord::GetNote(chord, 1, octave - 1));
+		notes.push_back(Chord::GetNote(chord, 2, octave - 1));
+	}
+	
+
+	if (seventhChance > 90) {
+		notes.push_back(Chord::GetNote(chord, 3, octave));
+	}
+
+
+
+
+	for (auto note : notes) {
+		GenerateNote(note, i * noteSize, noteSize);
+	}
+	
+	
 }
 
 // adapted from lecture

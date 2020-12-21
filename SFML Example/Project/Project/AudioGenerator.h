@@ -42,6 +42,8 @@ private:
 	void InitialGeneration();
 	void Generate();
 
+	void GenerateChord(const size_t& i);
+
 	void FillBackBuffer();
 	void FillOverflow();
 	void GenerateNote(float pitch, int startSampleIndex, const int samplesPerNote);
