@@ -27,12 +27,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Chord.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ProceduralAudioStream.cpp" />
     <ClCompile Include="AudioGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chord.h" />
+    <ClInclude Include="Chosrd.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MarkovChain.h" />
     <ClInclude Include="MarkovNode.h" />

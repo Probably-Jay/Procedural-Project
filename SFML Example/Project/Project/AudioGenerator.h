@@ -8,6 +8,7 @@
 #include <vector>
 #include "MarkovChain.h"
 #include "Chord.h"
+#include <iostream>
 
 constexpr auto PI = 3.1415f;
  

@@ -58,11 +58,11 @@ void AudioGenerator::SetUpMarkov()
 	mark.AddLink(vi, ii, 100 / 2.f); // to pre-dominant
 
 	// pre-dominant
-	mark.AddLink(IV, ii,	100 / 4.f); // movement within tonic area
-	mark.AddLink(IV, viidim,100 / 4.f); // to dominant
-	mark.AddLink(IV, V,		100 / 4.f); // to dominant
+	mark.AddLink(IV, ii,	30); // movement within tonic area
+	mark.AddLink(IV, viidim,30); // to dominant
+	mark.AddLink(IV, V,		30); // to dominant
 
-	mark.AddLink(IV, I,		100 / 4.f); // to tonic (plagal cadence)
+	mark.AddLink(IV, I,		10); // to tonic (plagal cadence)
 
 	mark.AddLink(ii, viidim,100 / 2.f); // to dominant
 	mark.AddLink(ii, V,		100 / 2.f); // to dominant
@@ -71,8 +71,10 @@ void AudioGenerator::SetUpMarkov()
 	mark.AddLink(viidim, V,	100 / 2.f); // movement within tonic area
 	mark.AddLink(viidim, I,	100 / 2.f); // to tonic (resoluition)
 
-	mark.AddLink(V, I,	70); // to tonic (resoluition)
-	mark.AddLink(V, vi,	30); // to re-dominant (deceptive cadance)
+	mark.AddLink(V, I,	55); // to tonic (resoluition)
+	mark.AddLink(V, vi,	45); // to tonic prelongation (deceptive cadance)
+
+	mark.SetAxiom(I);
 
 
 }
@@ -159,16 +161,19 @@ void AudioGenerator::Generate()
 		
 	}*/
 
-	//for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
-	//{
-	//	int index = rand() % Amaj.size();
-	//	const int noteSize = SAMPLESPERNOTE_s * 4;
-	//	for (size_t j = 0; j < 3; j++)
-	//	{
-	//		GenerateNote(chords[index][j], i * noteSize, noteSize);
+	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
+	{
+		//int index = rand() % Amaj.size();
+		auto chordFunction = mark.GetNext();
+		auto chord = Chord::functionalAMajor.at(chordFunction);
+		std::cout << "Chord: " << Chord::PrintChord(chord) << std::endl;
+		const int noteSize = SAMPLESPERNOTE_s * 4;
+		for (size_t j = 0; j < 3; j++)
+		{
+			GenerateNote(Chord::chords.at(chord)[j], i * noteSize, noteSize);
 
-	//	}
-	//}
+		}
+	}
 
 
 }
@@ -284,15 +289,16 @@ void AudioGenerator::SwapBuffers()
 	// if last hot buffer has not been sent yet, suspend here
 	std::unique_lock<std::mutex> lock(bufferSentMutex);
 	bufferSentCv.wait(lock, [this] {return bufferSent; });
+	bufferSent = false;
 	lock.unlock();
 
 	// mutex to modify hot buffer, just in case
 	std::unique_lock<std::mutex> lk(*hotbufferMutex);
 	hotBuffer.swap(backBuffer);
+	bufferReady = true;
 	lk.unlock();
 
 	// signal that the hot buffer can not be sent
-	bufferReady = true;
 	bufferReadyCv.notify_one(); // signal that the hot buffer can be read
 }
 
