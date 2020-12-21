@@ -41,7 +41,39 @@ void AudioGenerator::SetUpMarkov()
 	mark.AddState(vi); 
 	mark.AddState(viidim);
 
-	mark.AddLink(I,ii,100/6.f)
+	// tonic can move to any chord
+	mark.AddLink(I, ii, 100 / 6.f);
+	mark.AddLink(I, iii, 100 / 6.f);
+	mark.AddLink(I, IV, 100 / 6.f);
+	mark.AddLink(I, V, 100 / 6.f);
+	mark.AddLink(I, vi, 100 / 6.f);
+	mark.AddLink(I, viidim, 100 / 6.f);
+
+	// tonic prolongation
+	mark.AddLink(iii, vi, 100 / 3.f); // movement within tonic area
+	mark.AddLink(iii, ii, 100 / 3.f); // to pre-dominant
+	mark.AddLink(iii, IV, 100 / 3.f); // to pre-dominant
+
+	mark.AddLink(vi, IV, 100 / 2.f); // to pre-dominant
+	mark.AddLink(vi, ii, 100 / 2.f); // to pre-dominant
+
+	// pre-dominant
+	mark.AddLink(IV, ii,	100 / 4.f); // movement within tonic area
+	mark.AddLink(IV, viidim,100 / 4.f); // to dominant
+	mark.AddLink(IV, V,		100 / 4.f); // to dominant
+
+	mark.AddLink(IV, I,		100 / 4.f); // to tonic (plagal cadence)
+
+	mark.AddLink(ii, viidim,100 / 2.f); // to dominant
+	mark.AddLink(ii, V,		100 / 2.f); // to dominant
+
+	// dominant
+	mark.AddLink(viidim, V,	100 / 2.f); // movement within tonic area
+	mark.AddLink(viidim, I,	100 / 2.f); // to tonic (resoluition)
+
+	mark.AddLink(V, I,	70); // to tonic (resoluition)
+	mark.AddLink(V, vi,	30); // to re-dominant (deceptive cadance)
+
 
 }
 
