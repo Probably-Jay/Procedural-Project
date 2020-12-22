@@ -8,10 +8,14 @@
 //#include "SinWave.h"
 #include "ProceduralAudioStream.h"
 #include <memory>
+#include <iostream>
+#include "Chord.h"
 
 
 int main() {
  
+
+	srand(time(NULL));
 	//sf::SoundBuffer buffer;
  //	
 	//
@@ -26,6 +30,10 @@ int main() {
 
 	////GenerateAudio(samples, numberOfSamples);
 	//AudioGenerator * gen = new AudioGenerator();
+
+	
+
+	
 
 	ProceduralAudioStream stream;
 

@@ -15,8 +15,67 @@ AudioGenerator::AudioGenerator()
 	, bufferReady(false)
 	, bufferSent(true) // init both buffers
 	, sampleArray()
+	, mark()
 {
 	hotbufferMutex = std::make_unique<std::mutex>();
+	SetUpMarkov();
+	srand(time(0));
+}
+
+void AudioGenerator::SetUpMarkov()
+{
+	auto I		= Chord::Function::I;
+	auto ii		= Chord::Function::ii;
+	auto iii	= Chord::Function::iii;
+	auto IV		= Chord::Function::IV;
+	auto V		= Chord::Function::V;
+	auto vi		= Chord::Function::vi;
+	auto viidim	= Chord::Function::viidim;
+
+
+	mark.AddState(I);  
+	mark.AddState(ii); 
+	mark.AddState(iii);
+	mark.AddState(IV); 
+	mark.AddState(V);  
+	mark.AddState(vi); 
+	mark.AddState(viidim);
+
+	// tonic can move to any chord
+	mark.AddLink(I, ii, 100 / 6.f);
+	mark.AddLink(I, iii, 100 / 6.f);
+	mark.AddLink(I, IV, 100 / 6.f);
+	mark.AddLink(I, V, 100 / 6.f);
+	mark.AddLink(I, vi, 100 / 6.f);
+	mark.AddLink(I, viidim, 100 / 6.f);
+
+	// tonic prolongation
+	mark.AddLink(iii, vi, 100 / 3.f); // movement within tonic area
+	mark.AddLink(iii, ii, 100 / 3.f); // to pre-dominant
+	mark.AddLink(iii, IV, 100 / 3.f); // to pre-dominant
+
+	mark.AddLink(vi, IV, 100 / 2.f); // to pre-dominant
+	mark.AddLink(vi, ii, 100 / 2.f); // to pre-dominant
+
+	// pre-dominant
+	mark.AddLink(IV, ii,	30); // movement within tonic area
+	mark.AddLink(IV, viidim,30); // to dominant
+	mark.AddLink(IV, V,		30); // to dominant
+
+	mark.AddLink(IV, I,		10); // to tonic (plagal cadence)
+
+	mark.AddLink(ii, viidim,100 / 2.f); // to dominant
+	mark.AddLink(ii, V,		100 / 2.f); // to dominant
+
+	// dominant
+	mark.AddLink(viidim, V,	100 / 2.f); // movement within tonic area
+	mark.AddLink(viidim, I,	100 / 2.f); // to tonic (resoluition)
+
+	mark.AddLink(V, I,	55); // to tonic (resoluition)
+	mark.AddLink(V, vi,	45); // to tonic prelongation (deceptive cadance)
+
+	mark.SetAxiom(I);
+
 
 }
 
@@ -45,6 +104,8 @@ void AudioGenerator::End()
 
 void AudioGenerator::MainGeneration()
 {
+	srand(time(NULL));
+
 	std::unique_lock<std::mutex> lk(beginMutex);
 	beginCv.wait(lk, [this] {return this->began; }); // wait for signal to begin
 
@@ -77,61 +138,11 @@ void AudioGenerator::FillOverflow()
 
 void AudioGenerator::Generate()
 {
+
 	
-	std::vector<float> notes = {
-		  440 * powf(2, 0/12.f)
-		, 440 * powf(2, 2/12.f)
-		, 440 * powf(2, 4/12.f)
-		, 440 * powf(2, 5 / 12.f)
-		, 440 * powf(2, 7/12.f)
-		, 440 * powf(2, 9/12.f)
-		, 440 * powf(2, 11 / 12.f)
-	};
-
-	enum class NoteEnum
-	{
-		A = 0,
-		B,
-		Cs,
-		D,
-		E,
-		Fs,
-		G,
-	};
-
-	enum class ChordsEnum {
-		A,
-		D,
-		E,
-	};
-
-	std::vector<NoteEnum> penta = {
-		NoteEnum::A,
-		NoteEnum::B,
-		NoteEnum::Cs,
-		NoteEnum::E,
-		NoteEnum::Fs,
-	};
-
-	std::vector<NoteEnum> spicy = {
-		NoteEnum::D,
-		NoteEnum::G
-	};
-
-	std::vector<std::vector<float>> chords = {
-		{notes[(int)NoteEnum::A],	notes[(int)NoteEnum::Cs],	notes[(int)NoteEnum::E]},
-		{notes[(int)NoteEnum::D],	notes[(int)NoteEnum::Fs],	notes[(int)NoteEnum::A]},
-		{notes[(int)NoteEnum::E],	notes[(int)NoteEnum::G],	notes[(int)NoteEnum::B]},
-	};
-
-	std::vector<ChordsEnum> Amaj = {
-		ChordsEnum::A,
-		ChordsEnum::D,
-		ChordsEnum::E,
-	};
 
 
-	srand(time(0));
+	/*srand(time(0));
 	for (size_t i = 0; i < NOTESPERCHUNK; i++)
 	{
 		int index;
@@ -150,20 +161,96 @@ void AudioGenerator::Generate()
 		}
 		
 		
+	}*/
+	
+	auto note = Chord::GetRandomNote(Chord::Key::AMaj);
+	for (size_t i = 0; i < NOTESPERCHUNK; i++)
+	{
+	
+		const int noteSize = SAMPLESPERNOTE_s * 1;
+
+		int restChance = rand() % 100;
+
+		if (restChance > 100 / 8.0) { // rest, play no note
+		
+			GenerateNote(Chord::GetNote(note), i* noteSize, noteSize);
+			note = Chord::GetRandomNote(Chord::Key::AMaj,note);
+		}
+
+		
 	}
+
+
+
 
 	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
 	{
-		int index = rand() % Amaj.size();
-		const int noteSize = SAMPLESPERNOTE_s * 4;
-		for (size_t j = 0; j < 3; j++)
-		{
-			GenerateNote(chords[index][j], i * noteSize, noteSize);
-
-		}
+		GenerateChord(i);
 	}
 
 
+}
+
+void AudioGenerator::GenerateChord(const size_t& i)
+{
+	const auto chordFunction = mark.GetNext();
+	const auto chord = Chord::functionalAMajor.at(chordFunction);
+	std::cout << "Chord: " << Chord::PrintChord(chord) << std::endl;
+
+
+
+	const int noteSize = SAMPLESPERNOTE_s * 4;
+
+	const int inversionChance = rand() % 100;
+	const int seventhChance = rand() % 100;
+	const int octaveChance = rand() % 100;
+
+
+	if (octaveChance < 40) {
+		// no change
+	}
+	else if (octaveChance < 80) {
+		// move towards 0 (or no change)
+		if (chordOctave < 0) { chordOctave++; }
+		else if (chordOctave > 0) { chordOctave--; };
+	}
+	else if (octaveChance < 90) {
+		chordOctave++;
+	}
+	else {
+		chordOctave--;
+	}
+
+
+	std::vector<float> notes;
+
+	if (inversionChance < 80) {  // not inverted
+		for(int i = 0 ; i < 3; i ++)notes.push_back(Chord::GetNote(chord, i, chordOctave));
+	}
+	else if (inversionChance < 90) {  // firstInversion
+		notes.push_back(Chord::GetNote(chord, 0, chordOctave));
+		notes.push_back(Chord::GetNote(chord, 1, chordOctave));
+		notes.push_back(Chord::GetNote(chord, 2, chordOctave -1));
+	}
+	else { // second inversion
+		notes.push_back(Chord::GetNote(chord, 0, chordOctave));
+		notes.push_back(Chord::GetNote(chord, 1, chordOctave - 1));
+		notes.push_back(Chord::GetNote(chord, 2, chordOctave - 1));
+	}
+	
+
+	if (seventhChance > 90) {
+		notes.push_back(Chord::GetNote(chord, 3, chordOctave));
+	}
+
+
+
+
+	for (auto note : notes) {
+		GenerateNote(note, i * noteSize, noteSize);
+	}
+	
+	
 }
 
 // adapted from lecture
@@ -187,7 +274,7 @@ void AudioGenerator::GenerateSamples(int startSampleIndex, const int samplesPerN
 	{
 		if (i < (attack + decay)) // silence
 		{
-			float audio = SquareWave(index, sinIncrimentValue);
+			float audio = SinWave(index, sinIncrimentValue);
 
 
 			FillSamples(i, attack, decay, audio, envelopeFactor);
@@ -277,15 +364,16 @@ void AudioGenerator::SwapBuffers()
 	// if last hot buffer has not been sent yet, suspend here
 	std::unique_lock<std::mutex> lock(bufferSentMutex);
 	bufferSentCv.wait(lock, [this] {return bufferSent; });
+	bufferSent = false;
 	lock.unlock();
 
 	// mutex to modify hot buffer, just in case
 	std::unique_lock<std::mutex> lk(*hotbufferMutex);
 	hotBuffer.swap(backBuffer);
+	bufferReady = true;
 	lk.unlock();
 
 	// signal that the hot buffer can not be sent
-	bufferReady = true;
 	bufferReadyCv.notify_one(); // signal that the hot buffer can be read
 }
 
