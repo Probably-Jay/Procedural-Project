@@ -7,11 +7,11 @@
 struct Chord
 {
 
-	enum class Inversions {
+	/*enum class Inversions {
 		Root,
 		FirstInversion,
 		SecondInversion
-	};
+	};*/
 
 	enum class Note
 	{
@@ -70,14 +70,32 @@ struct Chord
 		, viidim
 	};
 
+
+	enum class ScaleDegrees
+	{
+		  tonic
+		, supertonic
+		, mediant
+		, subdominant
+		, dominant
+		, submediant
+		, leading
+	};
+
+
 	static const std::map<Note, float> pitches;
 
 	static const std::map<Chords, std::vector<float>> chords;
 
 	static const std::map<Function, Chords> functionalAMajor;
+	static const std::map<ScaleDegrees, Note> AMajorScale;
 
 	static inline float GetNote(Note note, int octave = 0) { return pow(2, octave) * pitches.at(note); };
 	static inline float GetNote(Chords chord, int note, int octave = 0) { return pow(2, octave) * chords.at(chord)[note]; };
+
+	static Chord::Note GetRandomNote(Key key);
+	static Chord::Note GetRandomNote(Key key, Note prevNote);
+
 
 	static std::string PrintChord(Chords chord) {
 

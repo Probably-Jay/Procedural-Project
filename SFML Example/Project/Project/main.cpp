@@ -8,12 +8,14 @@
 //#include "SinWave.h"
 #include "ProceduralAudioStream.h"
 #include <memory>
-
+#include <iostream>
 #include "Chord.h"
 
 
 int main() {
  
+
+	srand(time(NULL));
 	//sf::SoundBuffer buffer;
  //	
 	//

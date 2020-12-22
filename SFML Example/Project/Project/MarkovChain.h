@@ -38,6 +38,7 @@ template<class T>
 inline MarkovChain<T>::MarkovChain()
 	: currentNode(nullptr)
 {
+	srand(time(NULL));
 }
 
 template<class T>

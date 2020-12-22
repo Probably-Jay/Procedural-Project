@@ -19,7 +19,7 @@ AudioGenerator::AudioGenerator()
 {
 	hotbufferMutex = std::make_unique<std::mutex>();
 	SetUpMarkov();
-
+	srand(time(0));
 }
 
 void AudioGenerator::SetUpMarkov()
@@ -104,6 +104,8 @@ void AudioGenerator::End()
 
 void AudioGenerator::MainGeneration()
 {
+	srand(time(NULL));
+
 	std::unique_lock<std::mutex> lk(beginMutex);
 	beginCv.wait(lk, [this] {return this->began; }); // wait for signal to begin
 
@@ -136,7 +138,7 @@ void AudioGenerator::FillOverflow()
 
 void AudioGenerator::Generate()
 {
-	
+
 	
 
 
@@ -160,6 +162,26 @@ void AudioGenerator::Generate()
 		
 		
 	}*/
+	
+	auto note = Chord::GetRandomNote(Chord::Key::AMaj);
+	for (size_t i = 0; i < NOTESPERCHUNK; i++)
+	{
+	
+		const int noteSize = SAMPLESPERNOTE_s * 1;
+
+		int restChance = rand() % 100;
+
+		if (restChance > 100 / 8.0) { // rest, play no note
+		
+			GenerateNote(Chord::GetNote(note), i* noteSize, noteSize);
+			note = Chord::GetRandomNote(Chord::Key::AMaj,note);
+		}
+
+		
+	}
+
+
+
 
 	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
 	{
