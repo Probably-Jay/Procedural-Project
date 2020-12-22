@@ -34,7 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chord.h" />
-    <ClInclude Include="Chosrd.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MarkovChain.h" />
     <ClInclude Include="MarkovNode.h" />

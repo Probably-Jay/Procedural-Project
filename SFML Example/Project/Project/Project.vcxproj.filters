@@ -10,7 +10,9 @@
     <ClCompile Include="AudioGenerator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Chord.cpp" />
+    <ClCompile Include="Chord.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -33,9 +35,14 @@
     <ClInclude Include="StandardAlgorithms.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="MarkovChain.h" />
-    <ClInclude Include="MarkovNode.h" />
-    <ClInclude Include="Chosrd.h" />
-    <ClInclude Include="Chord.h" />
+    <ClInclude Include="Chord.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkovChain.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkovNode.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

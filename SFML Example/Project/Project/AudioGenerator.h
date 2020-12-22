@@ -104,6 +104,9 @@ private:
 
 	
 	MarkovChain<Chord::Function> mark;
+	int chordOctave = 0;
+
+
 
 };
 
