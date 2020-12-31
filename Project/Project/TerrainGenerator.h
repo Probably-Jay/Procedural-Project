@@ -15,9 +15,9 @@ public:
 
 
 
-	float amplitude = 18;
-	float frequency = 1.f / 128;
-	float groundLevel = 45;
+	const float amplitude = 18;
+	const float frequency = 1.f / 128;
+	const float groundLevel = 45;
 
 };
 

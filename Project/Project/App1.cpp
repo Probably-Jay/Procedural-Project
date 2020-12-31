@@ -132,11 +132,13 @@ void App1::Update()
 //	//SendChunks(pos, instanceCount);
 ////}
 
-void App1::UpdateChunks()
+void App1::UpdateChunks(bool forceUpdate)
 {
-	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(),2);
 
-	if (changedChunk) {
+	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(), 12);
+	bool update =  forceUpdate || chunkManager.ChunksAreLoading();
+
+	if (changedChunk || update) {
 		m_InstancedCube->initBuffers(renderer->getDevice(), chunkManager.GetActiveChunkData());
 	}
 

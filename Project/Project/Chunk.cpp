@@ -7,14 +7,28 @@ Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& 
 	, chunkID(id)
 {
 	chunkData = std::make_shared<vector<XMFLOAT3>>();
+	chunkMutex = std::make_shared<std::mutex>();
 	//chunkData = std::unique_ptr<vector<XMFLOAT3>>(new vector<XMFLOAT3>());
 	//chunkData = new vector<XMFLOAT3>();
 }
 
-std::vector<XMFLOAT3> const & Chunk::GetChunkData()const
+bool Chunk::IsActive() const
 {
-	return *chunkData;
+	if (currentlyLoading) return false;
+	else return chunkActive;
 }
+
+//std::vector<XMFLOAT3> const & Chunk::GetChunkData()const
+//{
+//	return *chunkData;
+//}
+
+//std::vector<XMFLOAT3> const& Chunk::RequestChunkData() const
+//{
+//	lock.lock();
+//	return GetChunkData();
+//}
+
 
 void Chunk::UnloadChunk()
 {
@@ -27,7 +41,8 @@ void Chunk::UnloadChunk()
 void Chunk::LoadChunk()
 {
 	if (!chunkLoaded) {
-		GenerateChunk();
+		thread t(&Chunk::GenerateChunk,this);
+		t.detach();
 	}
 }
 
@@ -69,78 +84,83 @@ void Chunk::UnloadIfInactive()
 
 
 
-void Chunk::OldGenerateChunk() {
-
-	chunkData->clear();
-	chunkData->reserve(MAXCHNKCAPACITY);
-
-
-	for (int i = 0; i < MAXCHNKCAPACITY; i++) {
-
-		float x = worldspaceCords.x + BLOCKSIZE * (i % CHUNKWIDTH);
-		float z = worldspaceCords.z + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
-
-		float y = worldspaceCords.y + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
-
-		bool solid = (
-			generator.CubeSolid(x, y, z) // we should be solid
-			&&
-			( // we are visible
-				!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
-				!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
-				!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
-				!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
-				!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
-				)); // this is a lot of noise calls but this should short-circuit most of the time
-
-		if (solid) {
-			chunkData->push_back(XMFLOAT3(x, y, z));
-		}
-	}
-	chunkData->shrink_to_fit();
-	chunkLoaded = true;
-
-}
+//void Chunk::OldGenerateChunk() {
+//
+//	chunkData->clear();
+//	chunkData->reserve(MAXCHNKCAPACITY);
+//
+//
+//	for (int i = 0; i < MAXCHNKCAPACITY; i++) {
+//
+//		float x = worldspaceCords.x + BLOCKSIZE * (i % CHUNKWIDTH);
+//		float z = worldspaceCords.z + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
+//
+//		float y = worldspaceCords.y + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
+//
+//		bool solid = (
+//			generator.CubeSolid(x, y, z) // we should be solid
+//			&&
+//			( // we are visible
+//				!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
+//				!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
+//				!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
+//				!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
+//				!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
+//				)); // this is a lot of noise calls but this should short-circuit most of the time
+//
+//		if (solid) {
+//			chunkData->push_back(XMFLOAT3(x, y, z));
+//		}
+//	}
+//	chunkData->shrink_to_fit();
+//	chunkLoaded = true;
+//
+//}
 
 void Chunk::GenerateChunk()
 {
-	chunkData->clear();
-	chunkData->reserve(MAXCHNKCAPACITY);
-
-
-	for (size_t X = 0; X < CHUNKWIDTH; X++)
+	currentlyLoading = true;
 	{
-		for (size_t Z = 0; Z < CHUNKWIDTH; Z++)
+		std::lock_guard<mutex>(*chunkMutex); // RAII
+		chunkData->clear();
+		chunkData->reserve(MAXCHNKCAPACITY);
+
+
+		for (size_t X = 0; X < CHUNKWIDTH; X++)
 		{
-			for (size_t Y = 0; Y < CHUNKHEIGHT; Y++)
+			for (size_t Z = 0; Z < CHUNKWIDTH; Z++)
 			{
+				for (size_t Y = 0; Y < CHUNKHEIGHT; Y++)
+				{
 
-				float x = worldspaceCords.x + BLOCKSIZE * X;
-				float z = worldspaceCords.z + BLOCKSIZE * Z;
+					float x = worldspaceCords.x + BLOCKSIZE * X;
+					float z = worldspaceCords.z + BLOCKSIZE * Z;
 
-				float y = worldspaceCords.y + BLOCKSIZE * Y;
+					float y = worldspaceCords.y + BLOCKSIZE * Y;
 
 
-				bool solid = (
-					generator.CubeSolid(x, y, z) // we should be solid
-					&&
-					( // we are visible
-						!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
-						!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
-						!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
-						!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
-						!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
-						)); // this is a lot of noise calls but this should short-circuit most of the time
+					bool solid = (
+						generator.CubeSolid(x, y, z) // we should be solid
+						&&
+						( // we are visible
+							!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
+							!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
+							!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
+							!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
+							!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
+							)); // this is a lot of noise calls but this should short-circuit most of the time
 
-				if (solid) {
-					chunkData->push_back(XMFLOAT3(x, y, z));
+					if (solid) {
+						chunkData->push_back(XMFLOAT3(x, y, z));
+					}
+
 				}
-
 			}
 		}
-	}
 
 
-	chunkData->shrink_to_fit();
-	chunkLoaded = true;
+		chunkData->shrink_to_fit();
+		chunkLoaded = true; 
+	} // end raii
+	currentlyLoading = false;
 }

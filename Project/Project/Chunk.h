@@ -4,6 +4,9 @@
 #include "DXF.h"	// include dxframework
 #include "TerrainGenerator.h"
 
+#include <mutex>
+
+
 constexpr int BLOCKSIZE = 2;
 constexpr int CHUNKWIDTH = 16;
 constexpr int CHUNKHEIGHT = 64;
@@ -18,7 +21,9 @@ public:
 
 	Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const & gen);
 
-	inline bool IsActive() const { return chunkActive; };
+	bool IsActive() const;
+	inline bool IsLoading() const{ return currentlyLoading; };
+
 	
 	//inline bool MarkedForCleanUp() { return chunkInactiveCount > INACTIVITYDESTRUCTIONTHRESHOLD; };
 
@@ -31,20 +36,37 @@ public:
 
 	const std::size_t chunkID;
 
-	std::vector<XMFLOAT3> const& GetChunkData()const;
+
+	struct LockedData
+	{
+		LockedData(std::vector<XMFLOAT3> const& d, std::mutex& mtx) : data(d), lk(mtx) {};
+		std::vector<XMFLOAT3> const& data;
+	private:
+		std::lock_guard<mutex>lk;
+	};
+
+	inline LockedData const&& RequestChunkData()const { return LockedData(GetChunkData(),*chunkMutex); };
+
 
 private:
+	inline std::vector<XMFLOAT3> const& GetChunkData()const { return *chunkData; };
+
 	void UnloadChunk();
 	void LoadChunk();
+
+	mutable std::shared_ptr<std::mutex> chunkMutex;
+	//mutable std::unique_lock<std::mutex> lock{ chunkMutex };
 
 	TerrainGenerator const & generator;
 
 	const XMINT2 chunkspaceCords;
 	const XMFLOAT3 worldspaceCords;
 
-	void OldGenerateChunk();
+	//void OldGenerateChunk();
 
 	void GenerateChunk();
+
+	bool currentlyLoading = false;
 
 	bool chunkLoaded = false;
 	

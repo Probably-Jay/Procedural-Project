@@ -30,7 +30,7 @@ protected:
 private:
 //	void LoadChunk(XMFLOAT3 chunkCords);
 
-	void UpdateChunks();
+	void UpdateChunks(bool forceUpdate = false);
 
 	InstanceShader* m_InstanceShader;
 	InstancedCubeMesh* m_InstancedCube;
