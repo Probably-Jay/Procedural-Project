@@ -12,6 +12,11 @@ Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& 
 	//chunkData = new vector<XMFLOAT3>();
 }
 
+Chunk::~Chunk()
+{
+	std::lock_guard<mutex>(*chunkMutex);
+}
+
 bool Chunk::IsActive() const
 {
 	if (currentlyLoading) return false;
@@ -120,7 +125,7 @@ void Chunk::UnloadIfInactive()
 void Chunk::GenerateChunk()
 {
 	currentlyLoading = true;
-	{
+	
 		std::lock_guard<mutex>(*chunkMutex); // RAII
 		chunkData->clear();
 		chunkData->reserve(MAXCHNKCAPACITY);
@@ -161,6 +166,6 @@ void Chunk::GenerateChunk()
 
 		chunkData->shrink_to_fit();
 		chunkLoaded = true; 
-	} // end raii
 	currentlyLoading = false;
-}
+	 
+}// end raii

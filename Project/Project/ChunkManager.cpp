@@ -141,7 +141,7 @@ void ChunkManager::CleanupChunks()
 	//https://www.fluentcpp.com/2018/09/21/remove-elements-associative-container-cpp/
 	for (auto ittr = chunksMap.begin(); ittr != chunksMap.end();)
 	{
-		if (!ittr->second.IsActive())
+		if ((!ittr->second.IsActive()) && (!ittr->second.IsLoading()))
 		{
 			ittr = chunksMap.erase(ittr);
 		}

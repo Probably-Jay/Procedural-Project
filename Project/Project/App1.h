@@ -42,7 +42,7 @@ private:
 
 	static const int chunkWidth = { 64 };
 
-	int renderDistance = 3;
+	int renderDistance = 2;
 
 	//std::unordered_map<XMFLOAT3, array<XMFLOAT3, chunkWidth * chunkWidth * chunkWidth>,> chunks;
 	std::map<size_t, array<XMFLOAT3, chunkWidth * chunkWidth * chunkWidth>> chunks;

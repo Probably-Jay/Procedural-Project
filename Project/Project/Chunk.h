@@ -20,6 +20,7 @@ public:
 	//static const int CHUNKWIDTH = { 64 };
 
 	Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const & gen);
+	~Chunk();
 
 	bool IsActive() const;
 	inline bool IsLoading() const{ return currentlyLoading; };
