@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include <map>
 
-constexpr int MAXCHUNKSINMEMORY = 256;
+constexpr int MAXCHUNKSINMEMORY = 1024;
 
 class ChunkManager
 {
