@@ -2,6 +2,9 @@
 // Calculate diffuse lighting for a single directional light (also texturing)
 
 Texture2D texture0 : register( t0 );
+Texture2D texture1 : register( t1 );
+Texture2D texture2 : register( t2 );
+
 SamplerState sampler0 : register( s0 );
 
 //Texture2D texture1 : register( t1 );
@@ -41,16 +44,10 @@ float4 main( InputType input ) : SV_TARGET
 {
 	float4 textureColour;
     float4 lightColour;
-    float4 grassTxt = float4(0.1, 1, 0.1, 1);
-    float4 sandTxt = float4(0.7, 0.7, 0.1, 1);
-    float4 rockTxt = float4(0.4, 0.4, 0.4, 1);
-    
-   // float border = 6;
-    
-    //gray = (0.5, 0.5, 0.5, 1);
+    float4 grassTxt     = texture0.Sample( sampler0, input.tex );
+    float4 sandTxt      = texture1.Sample( sampler0, input.tex );
+    float4 rockTxt      = texture2.Sample(sampler0, input.tex) * 1.2f;
 
-    // Sample the texture. Calculate light intensity and colour, return light*texture for final pixel colour.
-    textureColour = texture0.Sample( sampler0, input.tex );
     float height = input.worldPosition.y;
     float4 col;
     

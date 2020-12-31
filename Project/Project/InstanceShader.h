@@ -26,7 +26,7 @@ public:
 	InstanceShader( ID3D11Device* device, HWND hwnd );
 	~InstanceShader();
 
-	void setShaderParameters( ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, ID3D11ShaderResourceView* texture, Light* light, float groundLevel);
+	void setShaderParameters( ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, ID3D11ShaderResourceView* texture0,ID3D11ShaderResourceView* texture1,ID3D11ShaderResourceView* texture2, Light* light, float groundLevel);
 	void renderInstanced( ID3D11DeviceContext* deviceContext, int indexCount, int instanceCount );
 private:
 	void initShader( const wchar_t* cs, const wchar_t* ps );

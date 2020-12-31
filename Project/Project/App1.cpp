@@ -10,7 +10,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Load textures
-	textureMgr->loadTexture(L"grass", L"res/grass_14.png");
+	textureMgr->loadTexture(L"grass", L"res/grass.png");
+	textureMgr->loadTexture(L"sand", L"res/sand.png");
+	textureMgr->loadTexture(L"rock", L"res/rock.png");
 
 	// Create Mesh object and shader object
 	m_InstancedCube = new InstancedCubeMesh(renderer->getDevice(), renderer->getDeviceContext(), 1);
@@ -157,7 +159,7 @@ bool App1::render()
 	projectionMatrix = renderer->getProjectionMatrix();
 
 	// Send geometry data, set shader parameters, render object with shader
-	m_InstanceShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"), light, chunkManager.GetGroundLevel());
+	m_InstanceShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"grass"),textureMgr->getTexture(L"sand"),textureMgr->getTexture(L"rock"), light, chunkManager.GetGroundLevel());
 	m_InstancedCube->sendDataInstanced(renderer->getDeviceContext());
 	m_InstanceShader->renderInstanced(renderer->getDeviceContext(), m_InstancedCube->getIndexCount(), m_InstancedCube->GetInstanceCount());
 

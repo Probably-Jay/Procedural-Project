@@ -88,7 +88,7 @@ void InstanceShader::initShader( const wchar_t* vsFilename, const wchar_t* psFil
 }
 
 
-void InstanceShader::setShaderParameters( ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* grassTxt, Light* light, float groundLevel ) {
+void InstanceShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* grassTxt,ID3D11ShaderResourceView* sandTxt,ID3D11ShaderResourceView* rockTxt, Light* light, float groundLevel ) {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -142,6 +142,8 @@ void InstanceShader::setShaderParameters( ID3D11DeviceContext* deviceContext, co
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources( 0, 1, &grassTxt );
+	deviceContext->PSSetShaderResources( 1, 1, &sandTxt );
+	deviceContext->PSSetShaderResources( 2, 1, &rockTxt );
 	deviceContext->PSSetSamplers( 0, 1, &sampleState );
 }
 
