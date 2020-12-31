@@ -135,7 +135,7 @@ void App1::Update()
 void App1::UpdateChunks(bool forceUpdate)
 {
 
-	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(), 4);
+	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(), renderDistance);
 	bool update =  forceUpdate || chunkManager.ChunksAreLoading();
 
 	if (changedChunk || update) {
@@ -186,6 +186,9 @@ void App1::gui()
 	ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 	ImGui::Text("Chunk Cord: (%i, %i)", chunkManager.GetCurrentChunkCords().x, chunkManager.GetCurrentChunkCords().y);
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+
+	ImGui::Text("Warning!, setting render distance above 4 \n may **SIGNIFICANTLY** impact performance");
+	ImGui::SliderInt("Render distance", &renderDistance, 1, 16);
 
 	// Render UI
 	ImGui::Render();
