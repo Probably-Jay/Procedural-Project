@@ -38,6 +38,7 @@ void InstanceShader::initShader( const wchar_t* vsFilename, const wchar_t* psFil
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC positionBufferDesc;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 
 	// Load (+ compile) shader files
@@ -75,11 +76,19 @@ void InstanceShader::initShader( const wchar_t* vsFilename, const wchar_t* psFil
 	lightBufferDesc.MiscFlags = 0;
 	lightBufferDesc.StructureByteStride = 0;
 	renderer->CreateBuffer( &lightBufferDesc, NULL, &lightBuffer );
+	
+	positionBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	positionBufferDesc.ByteWidth = sizeof( PositionBufferType );
+	positionBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	positionBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	positionBufferDesc.MiscFlags = 0;
+	positionBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer( &positionBufferDesc, NULL, &positionBuffer );
 
 }
 
 
-void InstanceShader::setShaderParameters( ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, Light* light ) {
+void InstanceShader::setShaderParameters( ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* grassTxt, Light* light, float groundLevel ) {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -110,9 +119,29 @@ void InstanceShader::setShaderParameters( ID3D11DeviceContext* deviceContext, co
 	lightPtr->padding = 0.0f;
 	deviceContext->Unmap( lightBuffer, 0 );
 	deviceContext->PSSetConstantBuffers( 0, 1, &lightBuffer );
+	
+	PositionBufferType* posPtr;
+	deviceContext->Map( positionBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+	posPtr = (PositionBufferType*)mappedResource.pData;
+	posPtr->border = 6;
+
+
+	// rock 0% - 65% below ground
+	// sand = 65% - 90% // below ground
+	// grass = 90%+ // below ground
+
+	posPtr->rock = 0 +  (0.65f*groundLevel);
+	posPtr->sand = posPtr->rock + (0.25f * groundLevel);
+	posPtr->grass = 0.9f*groundLevel;
+
+	deviceContext->Unmap(positionBuffer, 0 );
+	deviceContext->PSSetConstantBuffers( 1, 1, &positionBuffer );
+
+
+
 
 	// Set shader texture resource in the pixel shader.
-	deviceContext->PSSetShaderResources( 0, 1, &texture );
+	deviceContext->PSSetShaderResources( 0, 1, &grassTxt );
 	deviceContext->PSSetSamplers( 0, 1, &sampleState );
 }
 
