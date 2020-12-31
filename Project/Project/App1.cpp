@@ -135,7 +135,7 @@ void App1::Update()
 void App1::UpdateChunks(bool forceUpdate)
 {
 
-	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(), 12);
+	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(), 4);
 	bool update =  forceUpdate || chunkManager.ChunksAreLoading();
 
 	if (changedChunk || update) {
