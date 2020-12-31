@@ -6,7 +6,9 @@
 
 constexpr int BLOCKSIZE = 2;
 constexpr int CHUNKWIDTH = 16;
-constexpr int MAXCHNKCAPACITY = CHUNKWIDTH * CHUNKWIDTH * CHUNKWIDTH;
+constexpr int CHUNKHEIGHT = 64;
+
+constexpr int MAXCHNKCAPACITY = CHUNKWIDTH * CHUNKWIDTH * CHUNKHEIGHT;
 constexpr int INACTIVITYUNLOADTHRESHOLD = 25;
 
 class Chunk
@@ -39,6 +41,8 @@ private:
 
 	const XMINT2 chunkspaceCords;
 	const XMFLOAT3 worldspaceCords;
+
+	void OldGenerateChunk();
 
 	void GenerateChunk();
 
