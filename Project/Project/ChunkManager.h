@@ -43,6 +43,8 @@ private:
 
 	void LoadChunkAt(DirectX::XMINT2& cords);
 
+	void LoadChunkAtAsync(XMINT2& cords);
+
 	void CleanupChunks();
 	
 	XMINT2 currentChunkCords;

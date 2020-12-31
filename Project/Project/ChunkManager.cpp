@@ -40,7 +40,7 @@ const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 	int size = 0;
 	for (auto& chunkPair : chunksMap) {
 		if (chunkPair.second.IsActive()) {
-			size += chunkPair.second.GetChunkData().size();
+			size += chunkPair.second.RequestChunkData().data.size();
 		}
 	} // calculate size for reserving
 
@@ -49,7 +49,7 @@ const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 
 	for (auto& chunkPair : chunksMap) {
 		if (chunkPair.second.IsActive()) {
-			auto tempChunk = chunkPair.second.GetChunkData();
+			auto tempChunk = chunkPair.second.RequestChunkData().data;
 			data.insert(data.end(), tempChunk.begin(), tempChunk.end());
 		}
 	} //concatenate data
@@ -76,6 +76,7 @@ void ChunkManager::LoadChunks(const int renderDistance)
 				XMINT2 cords = { xChunkOffset + currentChunkCords.x,zChunkOffset + currentChunkCords.y };
 
 				LoadChunkAt(cords);
+				//LoadChunkAtAsync(cords);
 			}
 		}
 	}
@@ -98,6 +99,17 @@ void ChunkManager::LoadChunks(const int renderDistance)
 }
 
 void ChunkManager::LoadChunkAt(XMINT2& cords)
+{
+	auto id = chunkHasher(cords);
+
+	if (chunksMap.count(id) == 0) { // does not exist, add it
+		chunksMap.emplace(std::pair<std::size_t, Chunk>(id, Chunk(id, cords, generator)));
+	}
+
+	chunksMap.at(id).Activate(); // activate chunk
+}
+
+void ChunkManager::LoadChunkAtAsync(XMINT2& cords)
 {
 	auto id = chunkHasher(cords);
 

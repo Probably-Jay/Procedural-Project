@@ -7,14 +7,22 @@ Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& 
 	, chunkID(id)
 {
 	chunkData = std::make_shared<vector<XMFLOAT3>>();
+	chunkMutex = std::make_shared<std::mutex>();
 	//chunkData = std::unique_ptr<vector<XMFLOAT3>>(new vector<XMFLOAT3>());
 	//chunkData = new vector<XMFLOAT3>();
 }
 
-std::vector<XMFLOAT3> const & Chunk::GetChunkData()const
-{
-	return *chunkData;
-}
+//std::vector<XMFLOAT3> const & Chunk::GetChunkData()const
+//{
+//	return *chunkData;
+//}
+
+//std::vector<XMFLOAT3> const& Chunk::RequestChunkData() const
+//{
+//	lock.lock();
+//	return GetChunkData();
+//}
+
 
 void Chunk::UnloadChunk()
 {
@@ -27,7 +35,8 @@ void Chunk::UnloadChunk()
 void Chunk::LoadChunk()
 {
 	if (!chunkLoaded) {
-		GenerateChunk();
+		thread t(&Chunk::GenerateChunk,this);
+		t.detach();
 	}
 }
 
@@ -104,6 +113,7 @@ void Chunk::OldGenerateChunk() {
 
 void Chunk::GenerateChunk()
 {
+	std::lock_guard<mutex>(*chunkMutex); // RAII
 	chunkData->clear();
 	chunkData->reserve(MAXCHNKCAPACITY);
 

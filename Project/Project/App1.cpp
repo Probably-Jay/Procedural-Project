@@ -28,7 +28,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	camera->setPosition(cPos.x, chunkManager.GetTerrainHeight(cPos)+5, cPos.y);
 
 	//LoadChunk();
-	UpdateChunks();
+	UpdateChunks(true);
 
 }
 
@@ -132,9 +132,9 @@ void App1::Update()
 //	//SendChunks(pos, instanceCount);
 ////}
 
-void App1::UpdateChunks()
+void App1::UpdateChunks(bool forceUpdate)
 {
-	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(),2);
+	bool changedChunk = chunkManager.UpdateChunksRendered(camera->getPosition(),2) || forceUpdate;
 
 	if (changedChunk) {
 		m_InstancedCube->initBuffers(renderer->getDevice(), chunkManager.GetActiveChunkData());

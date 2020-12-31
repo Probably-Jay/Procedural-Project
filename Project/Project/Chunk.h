@@ -4,6 +4,9 @@
 #include "DXF.h"	// include dxframework
 #include "TerrainGenerator.h"
 
+#include <mutex>
+
+
 constexpr int BLOCKSIZE = 2;
 constexpr int CHUNKWIDTH = 16;
 constexpr int CHUNKHEIGHT = 64;
@@ -31,11 +34,26 @@ public:
 
 	const std::size_t chunkID;
 
-	std::vector<XMFLOAT3> const& GetChunkData()const;
+
+	struct LockedData
+	{
+		LockedData(std::vector<XMFLOAT3> const& d, std::mutex& mtx) : data(d), lk(mtx) {};
+		std::vector<XMFLOAT3> const& data;
+	private:
+		std::lock_guard<mutex>lk;
+	};
+
+	inline LockedData const&& RequestChunkData()const { return LockedData(GetChunkData(),*chunkMutex); };
+
 
 private:
+	inline std::vector<XMFLOAT3> const& GetChunkData()const { return *chunkData; };
+
 	void UnloadChunk();
 	void LoadChunk();
+
+	mutable std::shared_ptr<std::mutex> chunkMutex;
+	//mutable std::unique_lock<std::mutex> lock{ chunkMutex };
 
 	TerrainGenerator const & generator;
 
