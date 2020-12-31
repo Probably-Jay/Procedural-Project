@@ -35,6 +35,15 @@ bool ChunkManager::InChunkLoaded(XMINT2 const& atChunkLocation)const
 	
 }
 
+bool ChunkManager::ChunksAreLoading() const
+{
+	for (auto const & chunk : chunksMap)
+	{
+		if (chunk.second.IsLoading()) { return true; }
+	}
+	return false;
+}
+
 const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 {
 	int size = 0;

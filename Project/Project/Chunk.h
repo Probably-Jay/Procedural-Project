@@ -21,7 +21,9 @@ public:
 
 	Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const & gen);
 
-	inline bool IsActive() const { return chunkActive; };
+	bool IsActive() const;
+	inline bool IsLoading() const{ return currentlyLoading; };
+
 	
 	//inline bool MarkedForCleanUp() { return chunkInactiveCount > INACTIVITYDESTRUCTIONTHRESHOLD; };
 
@@ -60,9 +62,11 @@ private:
 	const XMINT2 chunkspaceCords;
 	const XMFLOAT3 worldspaceCords;
 
-	void OldGenerateChunk();
+	//void OldGenerateChunk();
 
 	void GenerateChunk();
+
+	bool currentlyLoading = false;
 
 	bool chunkLoaded = false;
 	

@@ -14,6 +14,8 @@ public:
 
 	inline XMINT2 GetCurrentChunkCords()const { return currentChunkCords; };
 
+	bool ChunksAreLoading()const;
+
 	const vector<XMFLOAT3> GetActiveChunkData()const;
 
 	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator.GetTerrainHeight(pos.x,pos.z); };
@@ -26,9 +28,8 @@ private:
 	{
 		std::size_t operator()(XMINT2 const& vec) const
 		{
-			/*return std::hash<float>()(vec.x + std::hash<float>()(vec.y + std::hash<float>()(vec.z)));*/
-
-		https://stackoverflow.com/a/65313449/7711148
+			
+			//https://stackoverflow.com/a/65313449/7711148
 			std::hash<int> h;
 
 			return h(h(vec.x) + h(h(vec.y)));
@@ -49,7 +50,7 @@ private:
 	
 	XMINT2 currentChunkCords;
 
-	std::vector<Chunk> chunks;
+	//std::vector<Chunk> chunks;
 
 	TerrainGenerator generator;
 
