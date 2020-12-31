@@ -18,6 +18,8 @@ public:
 
 	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator.GetTerrainHeight(pos.x,pos.z); };
 
+	inline float GetGroundLevel()const { return generator.groundLevel; };
+
 private:
 
 	struct ChunkHasher
