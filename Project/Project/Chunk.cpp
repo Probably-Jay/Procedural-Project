@@ -73,7 +73,15 @@ void Chunk::GenerateChunk()
 	chunkData->clear();
 	chunkData->reserve(MAXCHNKCAPACITY);
 
+	FillChunkData();
 
+	chunkData->shrink_to_fit();
+	chunkLoaded = true; 
+	currentlyLoading = false;
+	 
+}// end raii
+void Chunk::FillChunkData()
+{
 	for (size_t X = 0; X < CHUNKWIDTH; X++)
 	{
 		for (size_t Z = 0; Z < CHUNKWIDTH; Z++)
@@ -86,29 +94,25 @@ void Chunk::GenerateChunk()
 
 				float y = worldspaceCords.y + BLOCKSIZE * Y;
 
-				
-					bool solid = (
-						generator->CubeSolid(x, y, z) // we should be solid
-						&&
-						( // we are visible
-							!generator->CubeSolid(x, y + BLOCKSIZE, z) || // above
-							!generator->CubeSolid(x - BLOCKSIZE, y, z) || // left
-							!generator->CubeSolid(x + BLOCKSIZE, y, z) || // right
-							!generator->CubeSolid(x, y, z + BLOCKSIZE) || // behind
-							!generator->CubeSolid(x, y, z - BLOCKSIZE)    // infront
-							)); // this is a lot of noise calls but this should short-circuit most of the time
-				
-				if (solid) {
-					chunkData->push_back(XMFLOAT3(x, y, z));
+
+				if (generator->CubeSolid(x, y, z)) { // cube is below ground (or on surface level)
+					if (( // we are visible
+						!generator->CubeSolid(x, y + BLOCKSIZE, z) || // above
+						!generator->CubeSolid(x - BLOCKSIZE, y, z) || // left
+						!generator->CubeSolid(x + BLOCKSIZE, y, z) || // right
+						!generator->CubeSolid(x, y, z + BLOCKSIZE) || // behind
+						!generator->CubeSolid(x, y, z - BLOCKSIZE)    // infront
+						)) {
+						chunkData->push_back(XMFLOAT3(x, y, z));
+					}
+					// else we are invisible below ground and there is no point drawing us
+				}
+				else { // above ground, we can exit this column now
+					break;
 				}
 
 			}
 		}
 	}
+}
 
-
-	chunkData->shrink_to_fit();
-	chunkLoaded = true; 
-	currentlyLoading = false;
-	 
-}// end raii

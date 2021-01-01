@@ -54,6 +54,8 @@ private:
 
 	void GenerateChunk();
 
+	void FillChunkData();
+
 
 	mutable std::shared_ptr<std::mutex> chunkMutex;
 	std::shared_ptr<std::lock_guard<std::mutex>> lock;
