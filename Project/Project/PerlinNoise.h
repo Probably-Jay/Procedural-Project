@@ -7,14 +7,9 @@ class PerlinNoise
 {
 public:
 
-
-	
 	static float Perlin(float x, float y);
 
 private:
-
-	
-
 
 	struct Vector2
 	{

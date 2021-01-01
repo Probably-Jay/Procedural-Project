@@ -28,7 +28,6 @@ private:
 	{
 		std::size_t operator()(XMINT2 const& vec) const
 		{
-			
 			//https://stackoverflow.com/a/65313449/7711148
 			std::hash<int> h;
 
@@ -44,20 +43,16 @@ private:
 
 	void LoadChunkAt(DirectX::XMINT2& cords);
 
-	void LoadChunkAtAsync(XMINT2& cords);
-
 	void CleanupChunks();
 	
 	XMINT2 currentChunkCords;
 
-	//std::vector<Chunk> chunks;
 
 	std::shared_ptr<TerrainGenerator> generator;
 
 
 
 	std::map<size_t, Chunk> chunksMap;
-	//std::map<size_t, Chunk&> activeChunks;
 
 };
 

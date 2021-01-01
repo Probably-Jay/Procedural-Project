@@ -17,30 +17,24 @@ constexpr int INACTIVITYUNLOADTHRESHOLD = 25;
 class Chunk
 {
 public:
-	//static const int CHUNKWIDTH = { 64 };
-
 	Chunk(size_t const id, XMINT2 const& chunkCords, std::shared_ptr<TerrainGenerator>& gen);
 	~Chunk();
 
-	void Lock();
+	void Lock(); // lock chunk for deletion
 
 	bool IsActive() const;
 	inline bool IsLoading() const{ return currentlyLoading; };
 
 	
-	//inline bool MarkedForCleanUp() { return chunkInactiveCount > INACTIVITYDESTRUCTIONTHRESHOLD; };
-
 	void Activate();
 	void Deactivate();
 
 	void UnloadIfInactive();
 	
-	//inline bool IsLoaded() const { return chunkLoaded; };
-
 	const std::size_t chunkID;
 
 
-	struct LockedData
+	struct LockedData // allows access to data in RAII way
 	{
 		LockedData(std::vector<XMFLOAT3> const& d, std::mutex& mtx) : data(d), lk(mtx) {};
 		std::vector<XMFLOAT3> const& data;
@@ -48,6 +42,7 @@ public:
 		std::lock_guard<mutex>lk;
 	};
 
+	// interface to data
 	inline LockedData const&& RequestChunkData()const { return LockedData(GetChunkData(),*chunkMutex); };
 
 
@@ -57,6 +52,9 @@ private:
 	void UnloadChunk();
 	void LoadChunk();
 
+	void GenerateChunk();
+
+
 	mutable std::shared_ptr<std::mutex> chunkMutex;
 	std::shared_ptr<std::lock_guard<std::mutex>> lock;
 
@@ -65,19 +63,11 @@ private:
 	const XMINT2 chunkspaceCords;
 	const XMFLOAT3 worldspaceCords;
 
-	//void OldGenerateChunk();
-
-	void GenerateChunk();
-
-	bool currentlyLoading = false;
-
-	bool chunkLoaded = false;
-	
-	bool chunkActive = false;
-	int chunkInactiveCount = 0;
+	bool currentlyLoading = false; // a thread is in `Generate`
+	bool chunkLoaded = false; // chunk exists in memory
+	bool chunkActive = false; // chunk is in render buffer
 	
 	std::shared_ptr<vector<XMFLOAT3>> chunkData;
-	//vector<XMFLOAT3> * chunkData;
 
 };
 

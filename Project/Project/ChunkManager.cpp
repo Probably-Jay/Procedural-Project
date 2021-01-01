@@ -15,7 +15,7 @@ bool ChunkManager::UpdateChunksRendered(XMFLOAT3 const& worldCords, const int re
 	else {
 		currentChunkCords = chunkCords;
 		LoadChunks(renderDistance);
-		return true;
+		return true; // have changed chunk
 	}
 }
 
@@ -69,10 +69,6 @@ const vector<XMFLOAT3> ChunkManager::GetActiveChunkData()const
 
 void ChunkManager::LoadChunks(const int renderDistance)
 {
-	//const int loadedChunks = renderDistance * renderDistance;
-	//nst int positionOffset = render;
-
-
 	for (auto  & chunkPair : chunksMap ) // deactiveate all chunks, unload old chunks
 	{
 		chunkPair.second.Deactivate();
@@ -85,7 +81,6 @@ void ChunkManager::LoadChunks(const int renderDistance)
 				XMINT2 cords = { xChunkOffset + currentChunkCords.x,zChunkOffset + currentChunkCords.y };
 
 				LoadChunkAt(cords);
-				//LoadChunkAtAsync(cords);
 			}
 		}
 	}
@@ -95,16 +90,6 @@ void ChunkManager::LoadChunks(const int renderDistance)
 		LoadChunkAt(cords);
 
 	}
-
-	//for (auto& chunkPair : chunksMap) // deactiveate all chunks, unload old chunks
-	//{
-	//	chunkPair.second.UnloadIfInactive();
-	//}
-
-	//if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
-	//	CleanupChunks();
-	//}
-
 }
 
 void ChunkManager::LoadChunkAt(XMINT2& cords)
@@ -118,26 +103,9 @@ void ChunkManager::LoadChunkAt(XMINT2& cords)
 	chunksMap.at(id).Activate(); // activate chunk
 }
 
-void ChunkManager::LoadChunkAtAsync(XMINT2& cords)
-{
-	auto id = chunkHasher(cords);
-
-	if (chunksMap.count(id) == 0) { // does not exist, add it
-		chunksMap.emplace(std::pair<std::size_t, Chunk>(id, Chunk(id, cords, generator)));
-	}
-
-	chunksMap.at(id).Activate(); // activate chunk
-}
 
 void ChunkManager::CleanupChunks()
 {
-	//chunksMap.erase(
-	//	std::remove_if(
-	//		chunksMap.begin(),
-	//		chunksMap.end(),
-	//		[](std::pair<std::size_t, Chunk>& pair) {return !pair.second.IsActive(); }),
-	//	chunksMap.end()
-	//);
 	//https://www.fluentcpp.com/2018/09/21/remove-elements-associative-container-cpp/
 	for (auto ittr = chunksMap.begin(); ittr != chunksMap.end();)
 	{
