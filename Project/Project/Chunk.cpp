@@ -1,10 +1,11 @@
 #include "Chunk.h"
 
-Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& gen)
+Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, std::shared_ptr<TerrainGenerator>& gen)
 	: chunkspaceCords(chunkCords)
 	, worldspaceCords(XMFLOAT3{ (float)chunkspaceCords.x * CHUNKWIDTH * BLOCKSIZE,0.f, (float)chunkspaceCords.y * CHUNKWIDTH * BLOCKSIZE })
 	, generator(gen)
 	, chunkID(id)
+	
 {
 	chunkData = std::make_shared<vector<XMFLOAT3>>();
 	chunkMutex = std::make_shared<std::mutex>();
@@ -14,7 +15,14 @@ Chunk::Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const& 
 
 Chunk::~Chunk()
 {
-	std::lock_guard<mutex>(*chunkMutex);
+	Lock();
+}
+
+void Chunk::Lock()
+{
+	if (!lock) {
+		lock = std::make_shared<std::lock_guard<mutex>>(*chunkMutex);
+	}
 }
 
 bool Chunk::IsActive() const
@@ -73,99 +81,52 @@ void Chunk::UnloadIfInactive()
 		UnloadChunk();
 	}
 }
-//
-//void Chunk::SetActive(bool active)
-//{
-//	chunkActive = active;
-//
-//	if (chunkActive) {
-//		chunkLoadsSinceActive = 0;
-//	}
-//	else {
-//		chunkLoadsSinceActive++;
-//	}
-//}
 
-
-
-
-//void Chunk::OldGenerateChunk() {
-//
-//	chunkData->clear();
-//	chunkData->reserve(MAXCHNKCAPACITY);
-//
-//
-//	for (int i = 0; i < MAXCHNKCAPACITY; i++) {
-//
-//		float x = worldspaceCords.x + BLOCKSIZE * (i % CHUNKWIDTH);
-//		float z = worldspaceCords.z + BLOCKSIZE * ((i / (int)CHUNKWIDTH) % CHUNKWIDTH);
-//
-//		float y = worldspaceCords.y + BLOCKSIZE * (i / (int)(CHUNKWIDTH * CHUNKWIDTH));
-//
-//		bool solid = (
-//			generator.CubeSolid(x, y, z) // we should be solid
-//			&&
-//			( // we are visible
-//				!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
-//				!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
-//				!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
-//				!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
-//				!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
-//				)); // this is a lot of noise calls but this should short-circuit most of the time
-//
-//		if (solid) {
-//			chunkData->push_back(XMFLOAT3(x, y, z));
-//		}
-//	}
-//	chunkData->shrink_to_fit();
-//	chunkLoaded = true;
-//
-//}
 
 void Chunk::GenerateChunk()
 {
 	currentlyLoading = true;
 	
-		std::lock_guard<mutex>(*chunkMutex); // RAII
-		chunkData->clear();
-		chunkData->reserve(MAXCHNKCAPACITY);
+	std::lock_guard<mutex>(*chunkMutex); // RAII
+	chunkData->clear();
+	chunkData->reserve(MAXCHNKCAPACITY);
 
 
-		for (size_t X = 0; X < CHUNKWIDTH; X++)
+	for (size_t X = 0; X < CHUNKWIDTH; X++)
+	{
+		for (size_t Z = 0; Z < CHUNKWIDTH; Z++)
 		{
-			for (size_t Z = 0; Z < CHUNKWIDTH; Z++)
+			for (size_t Y = 0; Y < CHUNKHEIGHT; Y++)
 			{
-				for (size_t Y = 0; Y < CHUNKHEIGHT; Y++)
-				{
 
-					float x = worldspaceCords.x + BLOCKSIZE * X;
-					float z = worldspaceCords.z + BLOCKSIZE * Z;
+				float x = worldspaceCords.x + BLOCKSIZE * X;
+				float z = worldspaceCords.z + BLOCKSIZE * Z;
 
-					float y = worldspaceCords.y + BLOCKSIZE * Y;
+				float y = worldspaceCords.y + BLOCKSIZE * Y;
 
-
+				
 					bool solid = (
-						generator.CubeSolid(x, y, z) // we should be solid
+						generator->CubeSolid(x, y, z) // we should be solid
 						&&
 						( // we are visible
-							!generator.CubeSolid(x, y + BLOCKSIZE, z) || // above
-							!generator.CubeSolid(x - BLOCKSIZE, y, z) || // left
-							!generator.CubeSolid(x + BLOCKSIZE, y, z) || // right
-							!generator.CubeSolid(x, y, z + BLOCKSIZE) || // behind
-							!generator.CubeSolid(x, y, z - BLOCKSIZE)    // infront
+							!generator->CubeSolid(x, y + BLOCKSIZE, z) || // above
+							!generator->CubeSolid(x - BLOCKSIZE, y, z) || // left
+							!generator->CubeSolid(x + BLOCKSIZE, y, z) || // right
+							!generator->CubeSolid(x, y, z + BLOCKSIZE) || // behind
+							!generator->CubeSolid(x, y, z - BLOCKSIZE)    // infront
 							)); // this is a lot of noise calls but this should short-circuit most of the time
-
-					if (solid) {
-						chunkData->push_back(XMFLOAT3(x, y, z));
-					}
-
+				
+				if (solid) {
+					chunkData->push_back(XMFLOAT3(x, y, z));
 				}
+
 			}
 		}
+	}
 
 
-		chunkData->shrink_to_fit();
-		chunkLoaded = true; 
+	chunkData->shrink_to_fit();
+	chunkLoaded = true; 
 	currentlyLoading = false;
 	 
 }// end raii

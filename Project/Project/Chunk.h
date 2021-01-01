@@ -19,8 +19,10 @@ class Chunk
 public:
 	//static const int CHUNKWIDTH = { 64 };
 
-	Chunk(size_t const id, XMINT2 const& chunkCords, TerrainGenerator const & gen);
+	Chunk(size_t const id, XMINT2 const& chunkCords, std::shared_ptr<TerrainGenerator>& gen);
 	~Chunk();
+
+	void Lock();
 
 	bool IsActive() const;
 	inline bool IsLoading() const{ return currentlyLoading; };
@@ -56,9 +58,9 @@ private:
 	void LoadChunk();
 
 	mutable std::shared_ptr<std::mutex> chunkMutex;
-	//mutable std::unique_lock<std::mutex> lock{ chunkMutex };
+	std::shared_ptr<std::lock_guard<std::mutex>> lock;
 
-	TerrainGenerator const & generator;
+	std::shared_ptr<TerrainGenerator> generator;
 
 	const XMINT2 chunkspaceCords;
 	const XMFLOAT3 worldspaceCords;

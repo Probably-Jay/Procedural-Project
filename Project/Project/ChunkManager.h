@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include <map>
 
-constexpr int MAXCHUNKSINMEMORY = 1024;
+constexpr int MAXCHUNKSINMEMORY = 100;
 
 class ChunkManager
 {
@@ -18,9 +18,9 @@ public:
 
 	const vector<XMFLOAT3> GetActiveChunkData()const;
 
-	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator.GetTerrainHeight(pos.x,pos.z); };
+	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator->GetTerrainHeight(pos.x,pos.z); };
 
-	inline float GetGroundLevel()const { return generator.groundLevel; };
+	inline float GetGroundLevel()const { return generator->groundLevel; };
 
 private:
 
@@ -52,7 +52,7 @@ private:
 
 	//std::vector<Chunk> chunks;
 
-	TerrainGenerator generator;
+	std::shared_ptr<TerrainGenerator> generator;
 
 
 

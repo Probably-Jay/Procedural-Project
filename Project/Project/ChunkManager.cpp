@@ -3,7 +3,7 @@
 ChunkManager::ChunkManager() 
 	: currentChunkCords({-1,-1}) 
 {
-
+	generator = std::make_shared<TerrainGenerator>();
 }
 
 bool ChunkManager::UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance)
@@ -101,9 +101,9 @@ void ChunkManager::LoadChunks(const int renderDistance)
 	//	chunkPair.second.UnloadIfInactive();
 	//}
 
-	if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
-		CleanupChunks();
-	}
+	//if (chunksMap.size() > MAXCHUNKSINMEMORY) { // if too many chunks exist, delete some
+	//	CleanupChunks();
+	//}
 
 }
 
@@ -143,6 +143,7 @@ void ChunkManager::CleanupChunks()
 	{
 		if ((!ittr->second.IsActive()) && (!ittr->second.IsLoading()))
 		{
+			ittr->second.Lock();
 			ittr = chunksMap.erase(ittr);
 		}
 		else
