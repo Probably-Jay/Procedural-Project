@@ -8,7 +8,6 @@ ProceduralAudioStream::ProceduralAudioStream()
 	: audioGenerator(std::make_shared< AudioGenerator>())
 	, hotBufferMutex(audioGenerator->GetBufferMutex())
 
-	//, generatorThread(new std::thread(&AudioGenerator::MainGeneration,audioGenerator))
 	// initial values
 	,chunkDuraton(1)
 	// default values
@@ -49,7 +48,7 @@ void ProceduralAudioStream::loadToSamples()
 }
 
 // based on standard onGetData from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
-bool ProceduralAudioStream::onGetData(Chunk& data)
+bool ProceduralAudioStream::onGetData(sf::SoundStream::Chunk& data)
 {
 	
 
@@ -73,7 +72,7 @@ bool ProceduralAudioStream::onGetData(Chunk& data)
 			data.samples = &samples[currentSample];
 		}
 	}
-	else {
+	else { // can stream chunk
 		data.samples = &samples[currentSample];
 	}
 

@@ -14,20 +14,17 @@ public:
 	~ProceduralAudioStream();
 
 	void Begin();
-	//void Init(unsigned int channelCount, unsigned int sampleRate);
 	
 private:
-	//void Init(std::unique_ptr<AudioGenerator> audioGeneratorPrt);
 	void loadToSamples();
 
 	std::shared_ptr<AudioGenerator> audioGenerator;
 	std::shared_ptr<std::mutex> hotBufferMutex;
 
-	virtual bool onGetData(Chunk& data);
+	virtual bool onGetData(sf::SoundStream::Chunk& data);
 
-	virtual void onSeek(sf::Time timeOffset) {};
+	virtual void onSeek(sf::Time timeOffset) {}; // overload unused pure virtual function
 
-	//std::unique_ptr<std::thread> generatorThread;
 	std::thread generatorThread;
 
 

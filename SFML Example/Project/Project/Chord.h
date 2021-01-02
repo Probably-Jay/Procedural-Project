@@ -7,12 +7,6 @@
 struct Chord
 {
 
-	/*enum class Inversions {
-		Root,
-		FirstInversion,
-		SecondInversion
-	};*/
-
 	enum class Note
 	{
 		  A		= 0
@@ -27,19 +21,6 @@ struct Chord
 		, Fs	= 9
 		, G		= 10
 		, Gs	= 11
-		
-		/*, A1	= 0		+12
-		, As1	= 1		+12
-		, B1	= 2		+12
-		, C1	= 3		+12
-		, Cs1	= 4		+12
-		, D1	= 5		+12
-		, Ds1	= 6		+12
-		, E1	= 7		+12
-		, F1	= 8		+12
-		, Fs1	= 9		+12
-		, G1	= 10	+12
-		, Gs1	= 11	+12*/
  	};
 
 	enum class Chords

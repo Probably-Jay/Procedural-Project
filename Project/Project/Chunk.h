@@ -26,8 +26,8 @@ public:
 	inline bool IsLoading() const{ return currentlyLoading; };
 
 	
-	void Activate();
-	void Deactivate();
+	void Activate(); // turn on the chunk (possibly generate or re-generate it)
+	void Deactivate(); // turn off the chunk
 
 	void UnloadIfInactive();
 	

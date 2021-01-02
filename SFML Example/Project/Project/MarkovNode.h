@@ -20,8 +20,6 @@ public:
 
 	void MarkTerminus();
 
-	//void NormaliseProbablility();
-
 private:
 	T payload;
 

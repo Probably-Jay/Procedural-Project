@@ -3,28 +3,28 @@
 #include "Chunk.h"
 #include <map>
 
-constexpr int MAXCHUNKSINMEMORY = 100;
+constexpr int MAXCHUNKSINMEMORY = 1024;
 
 class ChunkManager
 {
 public:
 	ChunkManager();
 
-	bool UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance);
+	bool UpdateChunksRendered(XMFLOAT3 const& worldCords, const int renderDistance); // manage which chunks should be loaded
 
-	inline XMINT2 GetCurrentChunkCords()const { return currentChunkCords; };
+	const vector<XMFLOAT3> GetActiveChunkData()const; // get active chunks' data to the render queue
 
-	bool ChunksAreLoading()const;
+	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator->GetTerrainHeight(pos.x,pos.z); }; // terrain hieght at given position, used for initialisng the camera
 
-	const vector<XMFLOAT3> GetActiveChunkData()const;
+	bool ChunksAreLoading()const; // if some chunks are still loading
 
-	const float GetTerrainHeight(XMFLOAT3 const& pos)const { return generator->GetTerrainHeight(pos.x,pos.z); };
+	inline XMINT2 GetCurrentChunkCords()const { return currentChunkCords; }; // position of player in chunkspace
 
-	inline float GetGroundLevel()const { return generator->groundLevel; };
+	inline float GetGroundLevel()const { return generator->groundLevel; }; // information used for texture blending
 
 private:
 
-	struct ChunkHasher
+	struct ChunkHasher // hashes a chunks cords into its ID
 	{
 		std::size_t operator()(XMINT2 const& vec) const
 		{
