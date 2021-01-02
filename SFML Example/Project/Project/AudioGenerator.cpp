@@ -9,7 +9,6 @@
 AudioGenerator::AudioGenerator()
 	: hotBuffer(&buffer1)
 	, backBuffer(&buffer2)
-	//, bps(BPS)
 	, began(false)
 	, ended(false)
 	, bufferReady(false)
@@ -138,30 +137,6 @@ void AudioGenerator::FillOverflow()
 
 void AudioGenerator::Generate()
 {
-
-	
-
-
-	/*srand(time(0));
-	for (size_t i = 0; i < NOTESPERCHUNK; i++)
-	{
-		int index;
-		int r = rand() % 10;
-		const int noteSize = SAMPLESPERNOTE_s * 1;
-		if (r<5) {
-			index = (int)penta[rand() % penta.size()];
-			GenerateNote(notes[index], i* noteSize, noteSize);
-		}
-		else if (r < 7){
-			index = (int)spicy[rand() % spicy.size()];
-			GenerateNote(notes[index], i* noteSize, noteSize);
-		}
-		else {
-
-		}
-		
-		
-	}*/
 	
 	auto note = Chord::GetRandomNote(Chord::Key::AMaj);
 	for (size_t i = 0; i < NOTESPERCHUNK; i++)
@@ -181,13 +156,10 @@ void AudioGenerator::Generate()
 	}
 
 
-
-
 	for (size_t i = 0; i < NOTESPERCHUNK/4; i++)
 	{
 		GenerateChord(i);
 	}
-
 
 }
 
@@ -205,7 +177,7 @@ void AudioGenerator::GenerateChord(const size_t& i)
 	const int seventhChance = rand() % 100;
 	const int octaveChance = rand() % 100;
 
-
+	// randomly move up or down an octave
 	if (octaveChance < 40) {
 		// no change
 	}
@@ -223,7 +195,7 @@ void AudioGenerator::GenerateChord(const size_t& i)
 
 
 	std::vector<float> notes;
-
+	// randomly play an inversion
 	if (inversionChance < 80) {  // not inverted
 		for(int i = 0 ; i < 3; i ++)notes.push_back(Chord::GetNote(chord, i, chordOctave));
 	}
@@ -331,8 +303,7 @@ void AudioGenerator::FillSamples(const size_t i, const int attack, const int dec
 		ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
 	}
 	else if (i < (attack + decay)) {
-		//float p =
-		ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
+ 		ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
 	}
 
 	audio *= ampEnvelope * envelopeFactor;
@@ -398,63 +369,7 @@ void AudioGenerator::FinishedWithHotBuffer(std::unique_ptr<sf::SoundBuffer> buff
 }
 
 
-void AudioGenerator::InitialGeneration()
-{
-	FillOverflow();
-	Generate();
-	FillBackBuffer();
-
-	throw;
-}
 
 
-void AudioGenerator::FillBuffer()
-{
-}
-
-//void AudioGenerator::trigger(float pitch, int sample)
-//{
-//	frequency = pitch;
-//	sinIncriment = (2 * PI * frequency) / sampleRate;
-//
-//	ampIndex = 0;
-//	startSample = sample; 
-//}
-
-
-
-// from lecture
-//void AudioGenerator::GenerateAudio(sf::Int16* buffer, const int numberOfSamples)
-//{
-//
-//	for (size_t i = startSample; i < numberOfSamples; i++)
-//	{
-//		if (ampIndex < 2)
-//		{
-//			float audio = sinf(sinIndex);
-//
-//			sinIndex += sinIncriment;
-//			if (sinIndex > 2 * 3.14f) sinIndex = 0;
-//
-//			float ampEnvelope;
-//
-//			if (ampIndex < 1.f) {
-//				ampEnvelope = ampIndex;
-//				ampIndex += 0.1f;
-//			}
-//			else if (ampIndex < 2.f) {
-//				ampEnvelope = 1.f - (ampIndex - 1.f);
-//				ampIndex += 0.00005f;
-//			}
-//
-//			audio *= ampEnvelope * 0.33f;
-//
-//			buffer[i] += (audio*32000);
-//
-//		}
-//
-//	}
-//	startSample = 0;
-//}
 
 

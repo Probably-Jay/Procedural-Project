@@ -167,6 +167,7 @@ Chord::Note Chord::GetRandomNote(Key key, Note prevNote)
 
 	int step = 0;
 
+	// step by one or two notes, up or down
 	if (leapChance < 45) {
 		step = 1;
 	}
