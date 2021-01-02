@@ -43,7 +43,7 @@ inline MarkovNode<T>::MarkovNode(T data)
 template<class T>
 inline std::shared_ptr<MarkovNode<T>> MarkovNode<T>::ProgressChain() const
 {
-	// accumulative probabllity should be 100, or this class is malformed and calling this has unpredictable results
+	// accumulative probabllity should be 100
 
 	int val = rand() % accumulativeProbablity +1;
 
@@ -53,7 +53,7 @@ inline std::shared_ptr<MarkovNode<T>> MarkovNode<T>::ProgressChain() const
 			return ittr->second;
 		}
 	}
-
+	// should never reach here if set up correcly
 	return std::shared_ptr<MarkovNode<T>>(nullptr);
 }
 
@@ -70,14 +70,10 @@ inline void MarkovNode<T>::AddLink(std::shared_ptr<MarkovNode<T>> node, int prob
 }
 
 template<class T>
-inline void MarkovNode<T>::MarkTerminus()
+inline void MarkovNode<T>::MarkTerminus() // if this state is final
 {
 	ClearLinks();
 	accumulativeProbablity = 100;
 }
 
-//template<class T>
-//inline void MarkovNode<T>::NormaliseProbablility()
-//{
-//
-//}
+
