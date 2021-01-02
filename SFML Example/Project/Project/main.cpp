@@ -16,61 +16,13 @@ int main() {
  
 
 	srand(time(NULL));
-	//sf::SoundBuffer buffer;
- //	
-	//
-	//const int numberOfSamples = 44100;
-	//
-	//sf::Int16 *samples = new sf::Int16[numberOfSamples];
-
-	//for (size_t i = 0; i < numberOfSamples; i++)
-	//{
-	//	samples[i] = 0;
-	//}
-
-	////GenerateAudio(samples, numberOfSamples);
-	//AudioGenerator * gen = new AudioGenerator();
-
-	
-
 	
 
 	ProceduralAudioStream stream;
 
 	stream.Begin();
 
-//	sinwave.trigger(440, 0);
-//	sinwave.GenerateAudio(samples, numberOfSamples);
 
-	/*for (size_t i = 0; i < numberOfSamples; i++)
-	{
-		if (abs(samples[i]) < 1) {
-			samples[i] *= 32000;
-		}
-	}*/
-
-	//sf::Int16 *samplea
-
-	//buffer.loadFromSamples(
-	//	samples,
-	//	numberOfSamples,
-	//	1,
-	//	numberOfSamples
-	//);
-	//sf::Sound sound;
-
-	//sound.setBuffer(buffer);
-
-	//sound.play();
-
-
-	//ProceduralAudioStream audioStream;
-
-	//audioStream.set
-
-
-	//delete[] samples;
-	//delete gen;
 	int p;
 	std::cin >> p;
 	return 0;

@@ -30,6 +30,13 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	//LoadChunk();
 	UpdateChunks();
 
+	//audioThread = thread(&App1::BeginAudio, this);
+
+
+}
+
+void App1::BeginAudio() {
+	//int o = system("AudioProject.exe");
 }
 
 
@@ -46,6 +53,8 @@ App1::~App1()
 		delete m_InstancedCube;
 		m_InstancedCube = 0;
 	}
+
+	audioThread.~thread();
 }
 
 

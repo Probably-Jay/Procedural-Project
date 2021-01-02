@@ -19,6 +19,8 @@ public:
 	~App1();
 	void init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input* in, bool VSYNC, bool FULL_SCREEN);
 
+	void BeginAudio();
+
 	bool frame();
 
 	void Update();
@@ -42,7 +44,9 @@ private:
 
 	static const int chunkWidth = { 64 };
 
-	int renderDistance = 3;
+	int renderDistance = 4;
+
+	thread audioThread;
 
 	//std::unordered_map<XMFLOAT3, array<XMFLOAT3, chunkWidth * chunkWidth * chunkWidth>,> chunks;
 	std::map<size_t, array<XMFLOAT3, chunkWidth * chunkWidth * chunkWidth>> chunks;

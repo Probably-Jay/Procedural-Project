@@ -24,8 +24,8 @@ ProceduralAudioStream::ProceduralAudioStream()
 
 ProceduralAudioStream::~ProceduralAudioStream()
 {
-	audioGenerator->End();
 	generatorThread.join();
+	audioGenerator->End();
 }
 
 void ProceduralAudioStream::Begin()
@@ -38,19 +38,7 @@ void ProceduralAudioStream::Begin()
 
 
 
-//// based off standard load from https://www.sfml-dev.org/tutorials/2.5/audio-streams.php
-//// made threadsafe by me
-//void ProceduralAudioStream::load(const sf::SoundBuffer& hotBuffer)
-//{
-//	std::lock_guard<std::mutex> lock(*hotBufferMutex); // raii mutex as audio stream is threaded
-//
-//	// extract the audio samples from the sound buffer to our own container
-//
-//	// reset the current playing position 
-//	currentSample = 0;
-//
-//}
-	
+
 
 void ProceduralAudioStream::loadToSamples()
 {
