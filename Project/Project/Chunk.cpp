@@ -50,7 +50,6 @@ void Chunk::Activate()
 {
 	chunkActive = true;
 	LoadChunk(); // load chunk if not already loaded
-	
 }
 
 void Chunk::Deactivate()
