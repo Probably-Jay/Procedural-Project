@@ -300,10 +300,10 @@ void AudioGenerator::FillSamples(const size_t i, const int attack, const int dec
 	float ampEnvelope = 0;
 
 	if (i < attack) {
-		ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i));
+		ampEnvelope = Lerp(0, 1, InvLerp(0, attack, i)); // go from 0 to 1 linearly, by the amount `i` is between 0 and `attack` 
 	}
 	else if (i < (attack + decay)) {
- 		ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i));
+ 		ampEnvelope = Lerp(1, 0, InvLerp(attack, (attack + decay), i)); // go from 1 to 0 linearly, by the amount `i` is between `attack` and `attack + decay`
 	}
 
 	audio *= ampEnvelope * envelopeFactor;
